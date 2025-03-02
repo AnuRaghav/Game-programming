@@ -155,7 +155,7 @@ void load_textures(SDL_Renderer* renderer) {
     paddle1_texture = IMG_LoadTexture(renderer, "paddle1.png");
     ball_texture = IMG_LoadTexture(renderer, "ball.png");
     
-    background_texture = IMG_LoadTexture(renderer, "tennis_court.jpg");
+    background_texture = IMG_LoadTexture(renderer, "tennis_court.png");
     p1win_texture = IMG_LoadTexture(renderer, "result1.png");
     
     p2win_texture = IMG_LoadTexture(renderer, "result2.png");
