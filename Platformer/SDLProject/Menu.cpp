@@ -31,7 +31,7 @@ void Menu::Initialize(int numLives) {
 }
 void Menu::Update(float deltaTime) {
     if (deltaTime == -1) {
-        state.nextScene = 2;
+        state.nextScene = 1;
     }
 }
 void Menu::Render(ShaderProgram *program) {
@@ -64,7 +64,7 @@ void Menu::Render(ShaderProgram *program) {
 
      
     Util::DrawText(program, Util::LoadTexture("font1.png"), "Rise of AI by", 1, -0.5, glm::vec3(1.75f, -3.0f, 0));
-    Util::DrawText(program, Util::LoadTexture("font1.png"), "Anuraghav", 1, -0.5, glm::vec3(1.25f, -4.0f, 0));
+    Util::DrawText(program, Util::LoadTexture("font1.png"), "Anuraghav", 1, -0.5, glm::vec3(3.0f, -4.0f, 0));
     Util::DrawText(program, Util::LoadTexture("font1.png"), "Press Enter/Return", 1, -0.5, glm::vec3(1.0f, -5.0f, 0));
     Util::DrawText(program, Util::LoadTexture("font1.png"), "to Start", 1, -0.5, glm::vec3(3.25f, -6.0f, 0));
 }

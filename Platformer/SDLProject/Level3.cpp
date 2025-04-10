@@ -2,7 +2,7 @@
 #define Level3_WIDTH 35
 #define Level3_HEIGHT 8
 
-#define LEVEL3_ENEMY_COUNT 1
+#define LEVEL3_ENEMY_COUNT 3
 using namespace std;
 
 unsigned int Level3_data[] =
@@ -63,6 +63,36 @@ void Level3::Initialize(int numLives) {
     state.enemies[0].jumpPower = 5.0f;
     state.enemies[0].acceleration = glm::vec3(0, -9.81, 0);
     
+    GLuint batTextureID = Util::LoadTexture("bat.png");
+    if (batTextureID == 0) {
+        batTextureID = Util::LoadTexture("fallback.png"); // optional fallback texture
+    }
+
+    state.enemies[1].entityType = BAT;
+    state.enemies[1].textureID = batTextureID;
+    state.enemies[1].batOrigin = glm::vec3(15, -3, 0);
+    state.enemies[1].position = state.enemies[1].batOrigin;
+    state.enemies[1].isActive = true;
+    state.enemies[1].animRight = new int[4]{0, 1, 2, 3};
+    state.enemies[1].animIndices = state.enemies[1].animRight;
+    state.enemies[1].animFrames = 4;
+    state.enemies[1].animIndex = 0;
+    state.enemies[1].animTime = 0;
+    state.enemies[1].animCols = 4;
+    state.enemies[1].animRows = 4;
+
+    state.enemies[2].entityType = BAT;
+    state.enemies[2].textureID = batTextureID;
+    state.enemies[2].batOrigin = glm::vec3(28, -3.5, 0);
+    state.enemies[2].position = state.enemies[2].batOrigin;
+    state.enemies[2].isActive = true;
+    state.enemies[2].animRight = new int[4]{0, 1, 2, 3};
+    state.enemies[2].animIndices = state.enemies[2].animRight;
+    state.enemies[2].animFrames = 4;
+    state.enemies[2].animIndex = 0;
+    state.enemies[2].animTime = 0;
+    state.enemies[2].animCols = 4;
+    state.enemies[2].animRows = 4;
 
     for (int i = 0; i < LEVEL3_ENEMY_COUNT; ++i) {
         state.enemies[i].isActive = true;
@@ -94,7 +124,7 @@ void Level3::Update(float deltaTime) {
     
 }
 void Level3::Render(ShaderProgram *program) {
-    Util::DrawText(program, Util::LoadTexture("font1.png"), "Level 2", 0.5f, -0.1f, glm::vec3(0, -2, 0));
+    Util::DrawText(program, Util::LoadTexture("font1.png"), "Level 3", 0.5f, -0.1f, glm::vec3(0, -2, 0));
     Util::DrawText(program, Util::LoadTexture("font1.png"), "Lives " + std::to_string(state.player->numLives), 0.5f, -0.1f, glm::vec3(0, -2.5, 0));
     state.map->Render(program);
     state.player->Render(program);

@@ -265,6 +265,10 @@ void Entity::Update(float deltaTime, Entity *player, Entity *objects, int object
     
     if (entityType == ENEMY) {
         AI(player);
+    } else if (entityType == BAT) {
+        batAngle += batSpeed * deltaTime;
+        position.x = batOrigin.x + cos(batAngle) * batRadius;
+        position.y = batOrigin.y + sin(batAngle) * batRadius;
     }
     
     if (animIndices != NULL) {
@@ -307,12 +311,12 @@ void Entity::Update(float deltaTime, Entity *player, Entity *objects, int object
         return;
     }
     
-    
-    
     if(entityType == PLAYER) {
         //CheckCollisionsY(objects, objectCount);
         //CheckCollisionsX(objects, objectCount);
         CheckEnemyCollided(objects, objectCount);
+    } else if (entityType == BAT && player != nullptr && CheckCollision(player)) {
+        player->isActive = false;
     }
     
     modelMatrix = glm::mat4(1.0f);

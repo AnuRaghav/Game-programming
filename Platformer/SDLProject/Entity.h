@@ -13,7 +13,7 @@
 #include "ShaderProgram.h"
 #include "Map.h"
 
-enum EntityType {PLAYER, PLATFORM, ENEMY};
+enum EntityType {PLAYER, PLATFORM, ENEMY, BAT};
 
 enum AIType {WALKER, WAITANDGO, JUMPER};
 enum AIState {IDLE, WALKING, ATTACKING, JUMPING};
@@ -33,8 +33,6 @@ public:
     
     bool jump = false;
     float jumpPower = 0;
-    
-    
     
     float speed;
     
@@ -64,6 +62,11 @@ public:
     
     bool pitRight = false;
     bool pitLeft = false;
+
+    glm::vec3 batOrigin;
+    float batRadius = 2.0f; // Radius of circular area
+    float batAngle = 0.0f; // Angle for circular motion
+    float batSpeed = 2.0f; // Speed of circular motion
     
     Entity();
     
