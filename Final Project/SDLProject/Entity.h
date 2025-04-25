@@ -68,11 +68,15 @@ public:
     
     bool pitRight = false;
     bool pitLeft = false;
+    
+    bool isUsingItem = false;
+    
+    float attackStartTime = -1.0f;
+    bool hasAttacked = false;
+    int attackFrameCounter = 0;
+    
+    
 
-    glm::vec3 batOrigin;
-    float batRadius = 2.0f; // Radius of circular area
-    float batAngle = 0.0f; // Angle for circular motion
-    float batSpeed = 2.0f; // Speed of circular motion
     float attackDelay = 1.0f;
     Entity();
     

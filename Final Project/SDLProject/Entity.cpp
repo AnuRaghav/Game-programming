@@ -30,6 +30,7 @@ Entity::Entity()
     animFrames = 0;
     animIndex = 0;
     animTime = 0.0f;
+
 }
 
 bool Entity::CheckCollision(Entity *other) {
@@ -199,20 +200,38 @@ void Entity::AISuit(Entity *player) {
         return;
     }
 
-    if (distance < 1.0f) {
-        // Close enough to attack
-        isAttacking = true;
+
+    if (distance < 0.5f) {
+        // In attack range
         movement = glm::vec3(0);
-        animIndex = 0;
-        animTime = 0.0f;
-        if (facingLeft) {
-            animIndices = animAttackLeft;
-        } else {
-            animIndices = animAttackRight;
+        if (!isAttacking) {
+            isAttacking = true;
+            animIndex = 0;
+            animTime = 0.0f;
+            attackStartTime = -1.0f;
+            hasAttacked = false;
+            animIndices = facingLeft ? animAttackLeft : animAttackRight;
+            animFrames = 5;
+            
         }
-        animFrames = 5;
+
+        if (!hasAttacked && player->isActive) {
+            attackFrameCounter++;
+//            cout << attackFrameCounter << endl;
+            if (attackFrameCounter >= 3) {
+                player->isActive = false;
+                hasAttacked = true;
+                attackFrameCounter = 0;
+            }
+        }
+
     } else if (distance < 4.0f) {
         // Chase the player
+        isAttacking = false;
+        hasAttacked = false;
+        attackStartTime = -1.0f;
+        attackFrameCounter = 0;
+
         if (player->position.x < position.x) {
             movement = glm::vec3(-1, 0, 0);
             animIndices = animLeft;
@@ -224,14 +243,15 @@ void Entity::AISuit(Entity *player) {
             animFrames = 10;
             facingLeft = false;
         }
+
     } else {
-        // Too far away to act
+        // Idle if far
+        isAttacking = false;
+        hasAttacked = false;
+        attackStartTime = -1.0f;
+        attackFrameCounter = 0;
         movement = glm::vec3(0);
-        if (facingLeft) {
-            animIndices = animIdleLeft;
-        } else {
-            animIndices = animIdle;
-        }
+        animIndices = facingLeft ? animIdleLeft : animIdle;
         animFrames = 8;
     }
 }

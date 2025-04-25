@@ -75,8 +75,8 @@ void Level1::Initialize(int numLives) {
     state.player->animRight = new int[10]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     state.player->animLeft = new int[10]{10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
     state.player->animIdle = new int[8]{20, 21, 22, 23, 24, 25, 26, 27};
-    state.player->animUseItemRight = new int[8]{30, 31, 32, 33, 34, 35, 36, 37};
-    state.player->animUseItemLeft = new int[8]{40, 41, 42, 43, 44, 45, 46, 47};
+    state.player->animUseItemRight = new int[6]{30, 31, 32, 33, 34, 35};
+    state.player->animUseItemLeft = new int[6]{40, 41, 42, 43, 44, 45};
     state.player->animAttackRight = new int[4]{50, 52, 54, 56};
     state.player->animAttackLeft = new int[4]{60, 62, 64, 66};
     state.player->animIdleLeft = new int[8]{70, 71, 72, 73, 74, 75, 76, 77};
@@ -133,6 +133,36 @@ void Level1::Update(float deltaTime) {
     state.player->Update(deltaTime, state.player, state.enemies, LEVEL1_ENEMY_COUNT, state.map);
     for (int i = 0; i < LEVEL1_ENEMY_COUNT; ++i) {
         state.enemies[i].Update(deltaTime, state.player, state.enemies, LEVEL1_ENEMY_COUNT, state.map);
+        // Attack logic: if player is attacking and within range, "kill" enemy
+        if (state.player->animIndices == state.player->animAttackRight ||
+            state.player->animIndices == state.player->animAttackLeft) {
+            float dist = glm::distance(state.player->position, state.enemies[i].position);
+            if (dist < 0.5f) { // Attack range threshold
+                state.enemies[i].isActive = false; // Enemy dies
+            }
+        }
+    }
+    
+    if (!state.player->isActive && state.player->numLives > 0) {
+        state.player->numLives -= 1;
+
+        if (state.player->numLives > 0) {
+            // Respawn player
+            state.player->position = glm::vec3(10, -10, 0);
+            state.player->movement = glm::vec3(0);
+            state.player->velocity = glm::vec3(0);
+            state.player->isActive = true;
+
+            // Reset enemies
+            for (int i = 0; i < LEVEL1_ENEMY_COUNT; ++i) {
+                state.enemies[i].isAttacking = false;
+                state.enemies[i].animIndex = 0;
+                state.enemies[i].animTime = 0.0f;
+            }
+        } else {
+            // Lives just hit 0, move to game over
+            state.nextScene = 4;
+        }
     }
   
 //    if (state.player->position.x >= 10 && state.player->position.y <= -3) {

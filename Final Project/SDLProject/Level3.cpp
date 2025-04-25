@@ -95,31 +95,7 @@ void Level3::Initialize(int numLives) {
         batTextureID = Util::LoadTexture("fallback.png"); // optional fallback texture
     }
 
-    state.enemies[1].entityType = SUIT;
-    state.enemies[1].textureID = batTextureID;
-    state.enemies[1].batOrigin = glm::vec3(15, -3, 0);
-    state.enemies[1].position = state.enemies[1].batOrigin;
-    state.enemies[1].isActive = true;
-    state.enemies[1].animRight = new int[4]{0, 1, 2, 3};
-    state.enemies[1].animIndices = state.enemies[1].animRight;
-    state.enemies[1].animFrames = 4;
-    state.enemies[1].animIndex = 0;
-    state.enemies[1].animTime = 0;
-    state.enemies[1].animCols = 4;
-    state.enemies[1].animRows = 4;
 
-    state.enemies[2].entityType = SUIT;
-    state.enemies[2].textureID = batTextureID;
-    state.enemies[2].batOrigin = glm::vec3(28, -3.5, 0);
-    state.enemies[2].position = state.enemies[2].batOrigin;
-    state.enemies[2].isActive = true;
-    state.enemies[2].animRight = new int[4]{0, 1, 2, 3};
-    state.enemies[2].animIndices = state.enemies[2].animRight;
-    state.enemies[2].animFrames = 4;
-    state.enemies[2].animIndex = 0;
-    state.enemies[2].animTime = 0;
-    state.enemies[2].animCols = 4;
-    state.enemies[2].animRows = 4;
 
     for (int i = 0; i < LEVEL3_ENEMY_COUNT; ++i) {
         state.enemies[i].isActive = true;
