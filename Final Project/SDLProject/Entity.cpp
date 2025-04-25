@@ -232,13 +232,16 @@ void Entity::AISuit(Entity *player) {
         attackStartTime = -1.0f;
         attackFrameCounter = 0;
 
-        if (player->position.x < position.x) {
-            movement = glm::vec3(-1, 0, 0);
+        // Move toward player in both x and y directions
+        glm::vec3 direction = glm::normalize(player->position - position);
+        movement = glm::vec3(direction.x, direction.y, 0);
+
+        // Update facing direction and animation
+        if (movement.x < 0) {
             animIndices = animLeft;
             animFrames = 10;
             facingLeft = true;
         } else {
-            movement = glm::vec3(1, 0, 0);
             animIndices = animRight;
             animFrames = 10;
             facingLeft = false;
@@ -370,6 +373,8 @@ void Entity::Render(ShaderProgram *program) {
         return;
     }
     
+    if (entityType == SAMPLE && isCollected) return;
+  
     modelMatrix = glm::mat4(1.0f);
     modelMatrix = glm::translate(modelMatrix, position);
     modelMatrix = glm::scale(modelMatrix, glm::vec3(width, height, 1.0f));

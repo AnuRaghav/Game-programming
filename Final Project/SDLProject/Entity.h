@@ -13,8 +13,22 @@
 #include "ShaderProgram.h"
 #include "Map.h"
 
-enum EntityType { PLAYER, PLATFORM, SUIT };
+enum EntityType { PLAYER, PLATFORM, SUIT , SAMPLE};
 enum AIType { SUIT_AI };
+
+enum SampleType {
+    tv1,
+    fireplace2,
+    tree3,
+    a4,
+    a5,
+    a6,
+    a7,
+    a8,
+    a9,
+    a10,
+    none
+};
 
 class Entity {
 public:
@@ -75,6 +89,10 @@ public:
     bool hasAttacked = false;
     int attackFrameCounter = 0;
     
+    
+    // stuff for sample -----------
+    bool isCollected = false;
+    SampleType sampleType = none;
     
 
     float attackDelay = 1.0f;

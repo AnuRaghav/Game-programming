@@ -9,4 +9,5 @@ public:
 private:
     int currentWave = 1;
     float waveDelayTimer = 0.0f;
+    std::vector<Entity> localSamples;
 };

@@ -1,4 +1,6 @@
 #include <cstdlib>
+#include <vector>
+
 #include "Level1.h"
 #define LEVEL1_WIDTH 30
 #define LEVEL1_HEIGHT 20
@@ -64,13 +66,13 @@ int level1_sampleData[] = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -151,6 +153,34 @@ void Level1::Initialize(int numLives) {
         state.enemies[i].height = 1.6f;
         state.enemies[i].width = 1.6f;
     }
+
+    GLuint sampleTextureID = Util::LoadTexture("sample.png");
+    for (int i = 0; i < LEVEL1_WIDTH * LEVEL1_HEIGHT; ++i) {
+        if (level1_sampleData[i] != -1) {
+            cout << "sample" << endl;
+            Entity sample;
+            sample.entityType = SAMPLE;
+            if (sample.textureID == 0) cout << "sample texture missing!" << endl;
+            int x = i % LEVEL1_WIDTH;
+            int y = i / LEVEL1_WIDTH;
+            if (level1_sampleData[i] == 1)
+                sample.sampleType = tv1;
+            else if (level1_sampleData[i] == 2)
+                sample.sampleType = fireplace2;
+            else if (level1_sampleData[i] == 3)
+                sample.sampleType = tree3;
+            float xPos = x * 1.0f;
+            float yPos = -y * 1.0f;
+            sample.position = glm::vec3(xPos, yPos, 0);
+            sample.textureID = sampleTextureID;
+            sample.width = 0.8f;
+            sample.height = 0.8f;
+            sample.isCollected = false;
+            sample.isActive = true;
+            localSamples.push_back(sample);
+            cout << "Sample position: " << sample.position.x << ", " << sample.position.y << endl;
+        }
+    }
 }
 void Level1::Update(float deltaTime) {
     state.player->Update(deltaTime, state.player, state.enemies, MAX_ENEMIES, state.map);
@@ -172,6 +202,7 @@ void Level1::Update(float deltaTime) {
 
         if (state.player->numLives > 0) {
             // Respawn player
+            
             state.player->position = glm::vec3(10, -10, 0);
             state.player->movement = glm::vec3(0);
             state.player->velocity = glm::vec3(0);
@@ -222,6 +253,10 @@ void Level1::Render(ShaderProgram *program) {
     Util::DrawText(program, Util::LoadTexture("font1.png"), "Level 1", 0.5f, -0.1f, glm::vec3(0.2, -2, 0));
     Util::DrawText(program, Util::LoadTexture("font1.png"), "Lives " + std::to_string(state.player->numLives), 0.5f, -0.1f, glm::vec3(0.2, -2.5, 0));
     state.map->Render(program);
+    // Render all local samples before player
+    for (Entity& sample : localSamples) {
+        sample.Render(program);
+    }
     state.player->Render(program);
     for (int i = 0; i < MAX_ENEMIES; ++i) {
         state.enemies[i].Render(program);
