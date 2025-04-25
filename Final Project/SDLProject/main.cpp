@@ -36,7 +36,10 @@
 #include "Level2.h"
 #include "Level3.h"
 #include "Lose.h"
+
 #include "Win.h"
+
+GLuint sampleIcons[10]; // Defined globally so it can be shared across levels
 
 using namespace std;
 

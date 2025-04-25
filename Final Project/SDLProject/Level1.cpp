@@ -9,7 +9,7 @@ using namespace std;
 
 static GLuint backgroundTextureID;
 
-GLuint sampleIcons[10];
+extern GLuint sampleIcons[10];
 
 
 int level1_data[] = {
@@ -225,7 +225,11 @@ void Level1::Update(float deltaTime) {
             float dist = glm::distance(state.player->position, sample.position);
             if (dist < 1.0f && useCounter >= 3) {
                 sample.isCollected = true;
-                state.samples.push_back(sample);
+                Entity collected = sample;
+                collected.isActive = true;
+                collected.position = glm::vec3(0);
+                state.samples.push_back(collected);
+                std::cout << "Collected sample! Total collected: " << state.samples.size() << std::endl;
                 useCounter = 0;
                 // Optional: Add sound or visual feedback here
             }
@@ -279,6 +283,9 @@ void Level1::Update(float deltaTime) {
             currentWave++;
             waveDelayTimer = 0.0f;
         }
+    } else if (activeEnemies == 0 && currentWave > 4) {
+        // All waves complete and no enemies remain
+        state.nextScene = 2; // Switch to Level 2
     }
 }
 void Level1::Render(ShaderProgram *program) {
@@ -335,4 +342,5 @@ void Level1::Render(ShaderProgram *program) {
         glDisableVertexAttribArray(program->texCoordAttribute);
     }
 }
+
 
