@@ -33,7 +33,5 @@ public:
     void Build();
     void Render(ShaderProgram *program);
     bool IsSolid(glm::vec3 position, float *penetration_x, float *penetration_y);
-    bool IsDeathBlock(glm::vec3 position);
-    bool IsJumpPad(glm::vec3 position);
     
 };

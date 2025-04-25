@@ -2,12 +2,12 @@
 #define LEVEL1_WIDTH 30
 #define LEVEL1_HEIGHT 20
 
-#define LEVEL1_ENEMY_COUNT 0
+#define LEVEL1_ENEMY_COUNT 1
 using namespace std;
 
 static GLuint backgroundTextureID;
 
-// Top-down style: 0=floor, 320/384=wallpaper
+
 int level1_data[] = {
    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -66,15 +66,20 @@ void Level1::Initialize(int numLives) {
     // Initialize Player
     state.player = new Entity();
     state.player->entityType = PLAYER;
-    state.player->position = glm::vec3(10, -12, 0);
+    state.player->position = glm::vec3(10, -10, 0);
     state.player->movement = glm::vec3(0);
     state.player->acceleration = glm::vec3(0, 0, 0);
     state.player->speed = 3.0f;
     state.player->textureID = Util::LoadTexture("cat.png");
     
-    state.player->animRight = new int[10] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    state.player->animLeft = new int[10] {10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
-    state.player->animIdle = new int[10] {20, 21, 22, 23, 24, 25, 26, 27, 28, 29};
+    state.player->animRight = new int[10]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    state.player->animLeft = new int[10]{10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
+    state.player->animIdle = new int[8]{20, 21, 22, 23, 24, 25, 26, 27};
+    state.player->animUseItemRight = new int[8]{30, 31, 32, 33, 34, 35, 36, 37};
+    state.player->animUseItemLeft = new int[8]{40, 41, 42, 43, 44, 45, 46, 47};
+    state.player->animAttackRight = new int[4]{50, 52, 54, 56};
+    state.player->animAttackLeft = new int[4]{60, 62, 64, 66};
+    state.player->animIdleLeft = new int[8]{70, 71, 72, 73, 74, 75, 76, 77};
     
     state.player->animIndices = state.player->animIdle;
     state.player->animFrames = 10;
@@ -92,28 +97,36 @@ void Level1::Initialize(int numLives) {
     
     state.enemies = new Entity[LEVEL1_ENEMY_COUNT];
     
-    GLuint enemyTextureID = Util::LoadTexture("bug.png");
     
-    state.enemies[0].entityType = ENEMY;
-    state.enemies[0].textureID = enemyTextureID;
-    state.enemies[0].position = glm::vec3(4, -5.0f, 0);
-    state.enemies[0].speed = 1;
-    state.enemies[0].aiType = WALKER;
-    state.enemies[0].aiState = IDLE;
-    state.enemies[0].jumpPower = 5.0f;
-    state.enemies[0].acceleration = glm::vec3(0, -9.81, 0);
-        
-    state.enemies[1].entityType = ENEMY;
-    state.enemies[1].textureID = enemyTextureID;
-    state.enemies[1].position = glm::vec3(10, -3.0f, 0);
-    state.enemies[1].speed = 1;
-    state.enemies[1].aiType = WAITANDGO;
-    state.enemies[1].aiState = IDLE;
-    state.enemies[1].jumpPower = 5.0f;
-    state.enemies[1].acceleration = glm::vec3(0, -9.81, 0);
+    GLuint suitTextureID = Util::LoadTexture("suit.png");
     
     for (int i = 0; i < LEVEL1_ENEMY_COUNT; ++i) {
         state.enemies[i].isActive = true;
+        state.enemies[i].entityType = SUIT;
+        state.enemies[i].textureID = suitTextureID;
+        state.enemies[i].aiType = SUIT_AI;
+
+        // Assign enemy animation arrays (each with their own new int[])
+        state.enemies[i].animRight = new int[10]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        state.enemies[i].animLeft = new int[10]{10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
+        state.enemies[i].animIdle = new int[10]{20, 21, 22, 23, 24, 25, 26, 27, 28, 29};
+        state.enemies[i].animIdleLeft = new int[10]{30, 31, 32, 33, 34, 35, 36, 37, 38, 39};
+        state.enemies[i].animAttackRight = new int[5]{40, 41, 42, 43, 44};
+        state.enemies[i].animAttackLeft = new int[5]{50, 51, 52, 53, 54};
+
+        state.enemies[i].position = glm::vec3(15, -10, 0);
+        state.enemies[i].movement = glm::vec3(0);
+        state.enemies[i].acceleration = glm::vec3(0);
+        state.enemies[i].speed = 1.5f;
+
+        state.enemies[i].animFrames = 10;
+        state.enemies[i].animIndex = 0;
+        state.enemies[i].animTime = 0;
+        state.enemies[i].animCols = 10;
+        state.enemies[i].animRows = 8;
+
+        state.enemies[i].height = 1.6f;
+        state.enemies[i].width = 1.6f;
     }
 }
 void Level1::Update(float deltaTime) {
@@ -121,24 +134,9 @@ void Level1::Update(float deltaTime) {
     for (int i = 0; i < LEVEL1_ENEMY_COUNT; ++i) {
         state.enemies[i].Update(deltaTime, state.player, state.enemies, LEVEL1_ENEMY_COUNT, state.map);
     }
-    if (state.player->numLives == 0) {
-        state.nextScene = 4;
-    }
-    bool anyAlive = false;
-    for (int i = 0; i < LEVEL1_ENEMY_COUNT; ++i) {
-        if (state.enemies[i].isActive == true) {
-            anyAlive = true;
-            break;
-        }
-    }
   
 //    if (state.player->position.x >= 10 && state.player->position.y <= -3) {
 //        state.nextScene = 2;
-//    }
-//    if (state.player->position.y <= -10 || state.player->isActive == false) {
-//        state.player->isActive = true;
-//        state.player->numLives -= 1;
-//        state.player->position = glm::vec3(1, 0, 0);
 //    }
 }
 void Level1::Render(ShaderProgram *program) {

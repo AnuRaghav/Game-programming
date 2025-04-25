@@ -13,16 +13,13 @@
 #include "ShaderProgram.h"
 #include "Map.h"
 
-enum EntityType {PLAYER, PLATFORM, ENEMY, BAT};
-
-enum AIType {WALKER, WAITANDGO, JUMPER};
-enum AIState {IDLE, WALKING, ATTACKING, JUMPING};
+enum EntityType { PLAYER, PLATFORM, SUIT };
+enum AIType { SUIT_AI };
 
 class Entity {
 public:
     EntityType entityType;
-    AIType aiType;
-    AIState aiState;
+    AIType aiType = SUIT_AI;
     glm::vec3 position;
     glm::vec3 movement;
     glm::vec3 acceleration;
@@ -34,6 +31,7 @@ public:
     bool jump = false;
     bool facingLeft = false;
     float jumpPower = 0;
+    int hitCounter= 0;
     
     float speed;
     
@@ -75,7 +73,7 @@ public:
     float batRadius = 2.0f; // Radius of circular area
     float batAngle = 0.0f; // Angle for circular motion
     float batSpeed = 2.0f; // Speed of circular motion
-    
+    float attackDelay = 1.0f;
     Entity();
     
     bool CheckCollision(Entity *other);
@@ -90,8 +88,6 @@ public:
     void Render(ShaderProgram *program);
     void DrawSpriteFromTextureAtlas(ShaderProgram *program, GLuint textureID, int index);
     
+    void AISuit(Entity *player);
     void AI(Entity *player);
-    void AIWalker(Entity *platforms, int platformCount);
-    void AIWaitAndGo(Entity *player);
-    void AIJumper();
 };

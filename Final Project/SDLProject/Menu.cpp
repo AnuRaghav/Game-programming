@@ -4,7 +4,7 @@ void Menu::Initialize(int numLives) {
     state.nextScene = -1;
     state.player = new Entity();
         state.player->entityType = PLAYER;
-        state.player->position = glm::vec3(5.0f, -5.0f, 0);
+        state.player->position = glm::vec3(3.25f, -6.0f, 0);
         state.player->movement = glm::vec3(0);
         state.player->acceleration = glm::vec3(0, -9.81f, 0);
         state.player->speed = 3.0f;
@@ -36,18 +36,23 @@ void Menu::Update(float deltaTime) {
 }
 void Menu::Render(ShaderProgram *program) {
     
-    GLuint backgroundTextureID = Util::LoadTexture("background.jpg");
+    GLuint backgroundTextureID = Util::LoadTexture("background.png");
     float vertices[] = {
-        -10, -7,
-         10, -7,
-         10,  7,
-        -10,  7
+        -5.0f, -3.75f,
+         5.0f, -3.75f,
+         5.0f,  3.75f,
+        -5.0f, -3.75f,
+         5.0f,  3.75f,
+        -5.0f,  3.75f
     };
+
     float texCoords[] = {
-        0, 1,
-        1, 1,
-        1, 0,
-        0, 0
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        1.0f, 0.0f,
+        0.0f, 1.0f,
+        1.0f, 0.0f,
+        0.0f, 0.0f
     };
     glBindTexture(GL_TEXTURE_2D, backgroundTextureID);
 
@@ -57,14 +62,14 @@ void Menu::Render(ShaderProgram *program) {
     glVertexAttribPointer(program->texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
     glEnableVertexAttribArray(program->texCoordAttribute);
 
-    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 
     glDisableVertexAttribArray(program->positionAttribute);
     glDisableVertexAttribArray(program->texCoordAttribute);
 
      
-    Util::DrawText(program, Util::LoadTexture("font1.png"), "Rise of AI by", 1, -0.5, glm::vec3(1.75f, -3.0f, 0));
-    Util::DrawText(program, Util::LoadTexture("font1.png"), "Anuraghav", 1, -0.5, glm::vec3(3.0f, -4.0f, 0));
-    Util::DrawText(program, Util::LoadTexture("font1.png"), "Press Enter/Return", 1, -0.5, glm::vec3(1.0f, -5.0f, 0));
-    Util::DrawText(program, Util::LoadTexture("font1.png"), "to Start", 1, -0.5, glm::vec3(3.25f, -6.0f, 0));
+    Util::DrawText(program, Util::LoadTexture("font1.png"), "                ", 1, -0.5, glm::vec3(1.75f, -3.0f, 0));
+    Util::DrawText(program, Util::LoadTexture("font1.png"), "                ", 1, -0.5, glm::vec3(3.0f, -4.0f, 0));
+    Util::DrawText(program, Util::LoadTexture("font1.png"), "           ", 1, -0.5, glm::vec3(1.0f, -5.0f, 0));
+    Util::DrawText(program, Util::LoadTexture("font1.png"), "                  ", 1, -0.5, glm::vec3(3.25f, -6.0f, 0));
 }

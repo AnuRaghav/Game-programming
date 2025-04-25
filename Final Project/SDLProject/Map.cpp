@@ -126,24 +126,5 @@ bool Map::IsSolid(glm::vec3 position, float *penetration_x, float *penetration_y
     return true;
 }
 
-bool Map::IsDeathBlock(glm::vec3 position) {
-    if (position.x < left_bound || position.x > right_bound) return false;
-    if (position.y > top_bound || position.y < bottom_bound) return false;
-    int tile_x = floor((position.x + (tile_size / 2)) / tile_size);
-    int tile_y = -(ceil(position.y - (tile_size / 2))) / tile_size;
-    if (tile_x < 0 || tile_x >= width) return false;
-    if (tile_y < 0 || tile_y >= height) return false;
-    int tile = levelData[tile_y * width + tile_x];
-    return (tile == 225 || tile == 226 || tile == 227 || tile ==  228 || tile == 212 || tile == 196);
-}
 
-bool Map::IsJumpPad(glm::vec3 position) {
-    if (position.x < left_bound || position.x > right_bound) return false;
-    if (position.y > top_bound || position.y < bottom_bound) return false;
-    int tile_x = floor((position.x + (tile_size / 2)) / tile_size);
-    int tile_y = -(ceil(position.y - (tile_size / 2))) / tile_size;
-    if (tile_x < 0 || tile_x >= width) return false;
-    if (tile_y < 0 || tile_y >= height) return false;
-    int tile = levelData[tile_y * width + tile_x];
-    return (tile == 107); // Horizontal jump pad
-}
+

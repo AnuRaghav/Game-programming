@@ -12,25 +12,24 @@ Entity::Entity()
     acceleration = glm::vec3(0);
     velocity = glm::vec3(0);
     speed = 0;
-    
+
     modelMatrix = glm::mat4(1.0f);
 
-    // Set animation grid for cat.png
     animCols = 10;
     animRows = 8;
 
-    // Animation indices for cat (player)
-    animRight = new int[10]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    animLeft = new int[10]{10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
-    animIdle = new int[8]{20, 21, 22, 23, 24, 25, 26, 27};
-    animUseItemRight = new int[8]{30, 31, 32, 33, 34, 35, 36, 37};
-    animUseItemLeft = new int[8]{40, 41, 42, 43, 44, 45, 46, 47};
-    animAttackRight = new int[4]{50, 52, 54, 56};
-    animAttackLeft = new int[4]{60, 62, 64, 66};
-    animIdleLeft = new int[8]{70, 71, 72, 73, 74, 75, 76, 77};
+    // Animation arrays will be assigned externally
+    animRight = nullptr;
+    animLeft = nullptr;
+    animIdle = nullptr;
+    animIdleLeft = nullptr;
+    animAttackRight = nullptr;
+    animAttackLeft = nullptr;
 
-    animIndices = animIdle;
-    animFrames = 4;
+    animIndices = nullptr;
+    animFrames = 0;
+    animIndex = 0;
+    animTime = 0.0f;
 }
 
 bool Entity::CheckCollision(Entity *other) {
@@ -92,10 +91,7 @@ void Entity::CheckEnemyCollided(Entity *enemies, int enemyCount) {
     collidedLeft = false;
     collidedRight = false;
     collidedTop = false;
-    CheckCollisionsX(enemies, enemyCount);
-    if (collidedLeft == true || collidedRight == true) isActive = false;
-    CheckCollisionsY(enemies, enemyCount);
-    if (collidedTop == true) isActive = false;
+    // Prevent collision glitches by skipping actual resolution with enemies
     if (collidedBottom == true) {
         for (int i = 0; i < enemyCount; ++i) {
             if (enemies[i].collidedTop == true) {
@@ -104,19 +100,7 @@ void Entity::CheckEnemyCollided(Entity *enemies, int enemyCount) {
         }
     }
     
-    /*for (int i = 0; i < enemyCount; ++i) {
-        if (CheckCollision(&enemies[i])) {
-            if (collidedBottom && enemies[i].collidedTop) {
-                cout << "enemy dead" << endl;
-                enemies[i].isActive = false;
-            }
-            else {
-                cout << "we ded" << endl;
-                isActive = false;
-                break;
-            }
-        }
-    }*/
+    // Legacy collision logic removed for clarity
 }
 
 void Entity::CheckCollisionsY(Map *map)
@@ -149,28 +133,16 @@ void Entity::CheckCollisionsY(Map *map)
         position.y += penetration_y;
         velocity.y = 0;
         collidedBottom = true;
-        if (entityType == PLAYER && map->IsDeathBlock(bottom)) {
-            isActive = false;
-            return;
-        }
     }
     else if (map->IsSolid(bottom_left, &penetration_x, &penetration_y) && velocity.y < 0) {
         position.y += penetration_y;
         velocity.y = 0;
         collidedBottom = true;
-        if (entityType == PLAYER && map->IsDeathBlock(bottom_left)) {
-            isActive = false;
-            return;
-        }
     }
     else if (map->IsSolid(bottom_right, &penetration_x, &penetration_y) && velocity.y < 0) {
         position.y += penetration_y;
         velocity.y = 0;
         collidedBottom = true;
-        if (entityType == PLAYER && map->IsDeathBlock(bottom_right)) {
-            isActive = false;
-            return;
-        }
     }
 }
 
@@ -212,61 +184,55 @@ void Entity::CheckPit(Entity *platforms, int platformCount) {
 
 void Entity::AI(Entity *player) {
     switch(aiType) {
-        case WALKER:
-            break;
-        case WAITANDGO:
-            AIWaitAndGo(player);
-            break;
-        case JUMPER:
-            AIJumper();
+        case SUIT_AI:
+            AISuit(player);
             break;
     }
 }
 
-void Entity::AIJumper() {
-    if (jump) {
-        jump = false;
-        velocity.y += jumpPower;
-    }
-}
+void Entity::AISuit(Entity *player) {
+    float distance = glm::distance(position, player->position);
 
-void Entity::AIWalker(Entity *platforms, int platformCount) {
-    if (movement == glm::vec3(0)) {
-        movement = glm::vec3(-1, 0, 0);
+    if (isAttacking) {
+        // Do not update movement or animation while attack is playing
+        movement = glm::vec3(0);
+        return;
     }
-    CheckPit(platforms, platformCount);
-    if (pitLeft) {
-        movement = glm::vec3(1, 0, 0);
-        pitLeft = false;
-    }
-    if (pitRight) {
-        movement = glm::vec3(-1, 0, 0);
-        pitRight = false;
-    }
-}
 
-void Entity::AIWaitAndGo(Entity *player) {
-    switch(aiState) {
-        case IDLE:
-            if (glm::distance(position, player->position) < 3.0f) {
-                aiState = WALKING;
-            }
-            break;
-            
-        case WALKING:
-            if (player->position.x < position.x) {
-                movement = glm::vec3(-1, 0, 0);
-            }
-            else {
-                movement = glm::vec3(1, 0, 0);
-            }
-            break;
-            
-        case JUMPING:
-            break;
-            
-        case ATTACKING:
-            break;
+    if (distance < 1.0f) {
+        // Close enough to attack
+        isAttacking = true;
+        movement = glm::vec3(0);
+        animIndex = 0;
+        animTime = 0.0f;
+        if (facingLeft) {
+            animIndices = animAttackLeft;
+        } else {
+            animIndices = animAttackRight;
+        }
+        animFrames = 5;
+    } else if (distance < 4.0f) {
+        // Chase the player
+        if (player->position.x < position.x) {
+            movement = glm::vec3(-1, 0, 0);
+            animIndices = animLeft;
+            animFrames = 10;
+            facingLeft = true;
+        } else {
+            movement = glm::vec3(1, 0, 0);
+            animIndices = animRight;
+            animFrames = 10;
+            facingLeft = false;
+        }
+    } else {
+        // Too far away to act
+        movement = glm::vec3(0);
+        if (facingLeft) {
+            animIndices = animIdleLeft;
+        } else {
+            animIndices = animIdle;
+        }
+        animFrames = 8;
     }
 }
 
@@ -279,18 +245,15 @@ void Entity::Update(float deltaTime, Entity *player, Entity *objects, int object
     collidedBottom = false;
     collidedLeft = false;
     collidedRight = false;
-    
+
     pitLeft = false;
     pitRight = false;
-    
-    if (entityType == ENEMY) {
+
+    // Let SUIT AI handle all movement and animation logic
+    if (entityType == SUIT) {
         AI(player);
-    } else if (entityType == BAT) {
-        batAngle += batSpeed * deltaTime;
-        position.x = batOrigin.x + cos(batAngle) * batRadius;
-        position.y = batOrigin.y + sin(batAngle) * batRadius;
     }
-    
+
     if (animIndices != NULL) {
         animTime += deltaTime;
         if (animTime >= 0.1f) {
@@ -304,7 +267,7 @@ void Entity::Update(float deltaTime, Entity *player, Entity *objects, int object
             }
         }
     }
-    
+
     if (!isAttacking && movement.x == 0 && movement.y == 0) {
         if (facingLeft && animIndices != animIdleLeft) {
             animIndices = animIdleLeft;
@@ -318,38 +281,30 @@ void Entity::Update(float deltaTime, Entity *player, Entity *objects, int object
             animTime = 0.0f;
         }
     }
-    
+
     if (jump) {
         jump = false;
         velocity.y += jumpPower;
     }
-    if (entityType == PLAYER && map->IsJumpPad(position)) {
-        position.x += 6.0f;
-        velocity.x = 10.0f; // Launch with high speed to the right
-    }
+
     velocity.x = movement.x * speed;
     velocity.y = movement.y * speed;
     velocity += acceleration * deltaTime;
-    
+
     position.y += velocity.y * deltaTime;
     CheckCollisionsY(map);
-    
+
     position.x += velocity.x * deltaTime;
     CheckCollisionsX(map);
-    
-    if (entityType == PLAYER && map->IsDeathBlock(position)) {
-        isActive = false;
-        return;
-    }
-    
+
     if(entityType == PLAYER) {
         //CheckCollisionsY(objects, objectCount);
         //CheckCollisionsX(objects, objectCount);
         CheckEnemyCollided(objects, objectCount);
-    } else if (entityType == BAT && player != nullptr && CheckCollision(player)) {
-        player->isActive = false;
     }
-    
+
+    // Removed: player deactivation on hitCounter >= 3
+
     modelMatrix = glm::mat4(1.0f);
     modelMatrix = glm::translate(modelMatrix, position);
 }
@@ -386,6 +341,9 @@ void Entity::Render(ShaderProgram *program) {
         return;
     }
     
+    modelMatrix = glm::mat4(1.0f);
+    modelMatrix = glm::translate(modelMatrix, position);
+    modelMatrix = glm::scale(modelMatrix, glm::vec3(width, height, 1.0f));
     program->SetModelMatrix(modelMatrix);
     
     if (animIndices != NULL) {

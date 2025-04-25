@@ -2,7 +2,7 @@
 #define LEVEL2_WIDTH 30
 #define LEVEL2_HEIGHT 20
 
-#define LEVEL2_ENEMY_COUNT 1
+#define LEVEL2_ENEMY_COUNT 0
 
 using namespace std;
 
@@ -89,15 +89,7 @@ void Level2::Initialize(int numLives) {
     
     state.enemies = new Entity[LEVEL2_ENEMY_COUNT];
     GLuint enemyTextureID = Util::LoadTexture("bug.png");
-    
-    state.enemies[0].entityType = ENEMY;
-    state.enemies[0].textureID = enemyTextureID;
-    state.enemies[0].position = glm::vec3(12, -2, 0);
-    state.enemies[0].speed = 1;
-    state.enemies[0].aiType = WAITANDGO;
-    state.enemies[0].aiState = IDLE;
-    state.enemies[0].jumpPower = 5.0f;
-    state.enemies[0].acceleration = glm::vec3(0, -9.81, 0);
+
     
     for (int i = 0; i < LEVEL2_ENEMY_COUNT; ++i) {
         state.enemies[i].isActive = true;

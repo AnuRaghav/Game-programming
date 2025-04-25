@@ -2,7 +2,7 @@
 #define Level3_WIDTH 30
 #define Level3_HEIGHT 20
 
-#define LEVEL3_ENEMY_COUNT 3
+#define LEVEL3_ENEMY_COUNT 0
 using namespace std;
 
 int level3_data[] = {
@@ -88,21 +88,14 @@ void Level3::Initialize(int numLives) {
     state.enemies = new Entity[LEVEL3_ENEMY_COUNT];
     GLuint enemyTextureID = Util::LoadTexture("bug.png");
     
-    state.enemies[0].entityType = ENEMY;
-    state.enemies[0].textureID = enemyTextureID;
-    state.enemies[0].position = glm::vec3(24, -2.25, 0);
-    state.enemies[0].speed = 1;
-    state.enemies[0].aiType = WAITANDGO;
-    state.enemies[0].aiState = IDLE;
-    state.enemies[0].jumpPower = 5.0f;
-    state.enemies[0].acceleration = glm::vec3(0, -9.81, 0);
+ 
     
     GLuint batTextureID = Util::LoadTexture("bat.png");
     if (batTextureID == 0) {
         batTextureID = Util::LoadTexture("fallback.png"); // optional fallback texture
     }
 
-    state.enemies[1].entityType = BAT;
+    state.enemies[1].entityType = SUIT;
     state.enemies[1].textureID = batTextureID;
     state.enemies[1].batOrigin = glm::vec3(15, -3, 0);
     state.enemies[1].position = state.enemies[1].batOrigin;
@@ -115,7 +108,7 @@ void Level3::Initialize(int numLives) {
     state.enemies[1].animCols = 4;
     state.enemies[1].animRows = 4;
 
-    state.enemies[2].entityType = BAT;
+    state.enemies[2].entityType = SUIT;
     state.enemies[2].textureID = batTextureID;
     state.enemies[2].batOrigin = glm::vec3(28, -3.5, 0);
     state.enemies[2].position = state.enemies[2].batOrigin;

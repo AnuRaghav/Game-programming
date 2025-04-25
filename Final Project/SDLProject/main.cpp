@@ -1,7 +1,7 @@
 /**
 * Author: Anuraghav Padmaprasad
-* Assignment: Platformer
-* Date due: 2025-04-07, 11:59pm
+* Assignment: Final Project
+* Date due: 2025-04-25, 11:59pm
 * I pledge that I have completed this assignment without
 * collaborating with anyone else, in conformance with the
 * NYU School of Engineering Policies and Procedures on
@@ -71,7 +71,7 @@ void Initialize() {
     glewInit();
 #endif
     
-    glViewport(0, 0, 640, 480);
+    
     
     program.Load("shaders/vertex_textured.glsl", "shaders/fragment_textured.glsl");
     
