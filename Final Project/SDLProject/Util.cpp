@@ -60,3 +60,4 @@ void Util::DrawText(ShaderProgram *program, GLuint fontTexture, std::string text
             glDisableVertexAttribArray(program->positionAttribute);
             glDisableVertexAttribArray(program->texCoordAttribute);
         }
+

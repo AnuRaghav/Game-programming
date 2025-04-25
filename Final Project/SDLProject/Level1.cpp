@@ -1,6 +1,5 @@
 #include <cstdlib>
 #include <vector>
-
 #include "Level1.h"
 #define LEVEL1_WIDTH 30
 #define LEVEL1_HEIGHT 20
@@ -9,6 +8,8 @@
 using namespace std;
 
 static GLuint backgroundTextureID;
+
+GLuint sampleIcons[10];
 
 
 int level1_data[] = {
@@ -155,6 +156,17 @@ void Level1::Initialize(int numLives) {
     }
 
     GLuint sampleTextureID = Util::LoadTexture("sample.png");
+    
+    sampleIcons[0] = Util::LoadTexture("tv.png");
+    sampleIcons[1] = Util::LoadTexture("fireplace.png");
+    sampleIcons[2] = Util::LoadTexture("tree.png");
+    sampleIcons[3] = Util::LoadTexture("frog.png");
+    sampleIcons[4] = Util::LoadTexture("door.png");
+    sampleIcons[5] = Util::LoadTexture("microwave.png");
+    sampleIcons[6] = Util::LoadTexture("balloon.png");
+    sampleIcons[7] = Util::LoadTexture("piano.png");
+    sampleIcons[8] = Util::LoadTexture("guitar.png");
+    sampleIcons[9] = Util::LoadTexture("drums.png");
     for (int i = 0; i < LEVEL1_WIDTH * LEVEL1_HEIGHT; ++i) {
         if (level1_sampleData[i] != -1) {
             cout << "sample" << endl;
@@ -197,31 +209,54 @@ void Level1::Update(float deltaTime) {
         }
     }
 
+    
+    const Uint8 *keys = SDL_GetKeyboardState(NULL);
+    static int useCounter = 0;
+    static float useCooldown = 0.0f;
+
+    useCooldown -= deltaTime;
+    if (keys[SDL_SCANCODE_E] && useCooldown <= 0.0f) {
+        useCounter++;
+        useCooldown = 0.2f;
+    }
+
+    for (Entity& sample : localSamples) {
+        if (!sample.isCollected && sample.isActive) {
+            float dist = glm::distance(state.player->position, sample.position);
+            if (dist < 1.0f && useCounter >= 3) {
+                sample.isCollected = true;
+                state.samples.push_back(sample);
+                useCounter = 0;
+                // Optional: Add sound or visual feedback here
+            }
+        }
+    }
+
     if (!state.player->isActive && state.player->numLives > 0) {
         state.player->numLives -= 1;
 
         if (state.player->numLives > 0) {
-            // Respawn player
+            
             
             state.player->position = glm::vec3(10, -10, 0);
             state.player->movement = glm::vec3(0);
             state.player->velocity = glm::vec3(0);
             state.player->isActive = true;
 
-            // Reset enemies
+            
             for (int i = 0; i < MAX_ENEMIES; ++i) {
                 state.enemies[i].isAttacking = false;
                 state.enemies[i].animIndex = 0;
                 state.enemies[i].animTime = 0.0f;
             }
         } else {
-            // Lives just hit 0, move to game over
+            
             state.nextScene = 4;
         }
     }
 
-    // Wave logic
-    int expectedEnemies = pow(2, currentWave - 1); // 1, 2, 4, 8
+    
+    int expectedEnemies = pow(2, currentWave - 1);
     int activeEnemies = 0;
 
     for (int i = 0; i < MAX_ENEMIES; ++i) {
@@ -230,7 +265,7 @@ void Level1::Update(float deltaTime) {
 
     if (activeEnemies == 0 && currentWave <= 4) {
         waveDelayTimer += deltaTime;
-        if (waveDelayTimer > 2.0f) { // 2 seconds between waves
+        if (waveDelayTimer > 2.0f) {
             for (int i = 0, spawned = 0; i < MAX_ENEMIES && spawned < expectedEnemies; ++i) {
                 if (!state.enemies[i].isActive) {
                     state.enemies[i].isActive = true;
@@ -253,7 +288,7 @@ void Level1::Render(ShaderProgram *program) {
     Util::DrawText(program, Util::LoadTexture("font1.png"), "Level 1", 0.5f, -0.1f, glm::vec3(0.2, -2, 0));
     Util::DrawText(program, Util::LoadTexture("font1.png"), "Lives " + std::to_string(state.player->numLives), 0.5f, -0.1f, glm::vec3(0.2, -2.5, 0));
     state.map->Render(program);
-    // Render all local samples before player
+    
     for (Entity& sample : localSamples) {
         sample.Render(program);
     }
@@ -261,4 +296,43 @@ void Level1::Render(ShaderProgram *program) {
     for (int i = 0; i < MAX_ENEMIES; ++i) {
         state.enemies[i].Render(program);
     }
+    
+    for (int i = 0; i < state.samples.size(); ++i) {
+        int sampleIndex = static_cast<int>(state.samples[i].sampleType); // enum to index
+        GLuint icon = sampleIcons[sampleIndex];
+
+        float x = -4.5f + (i * 0.8f);
+        float y = 3.3f;
+
+        float width = 0.6f;
+        float height = 0.6f;
+
+        float vertices[] = {
+            x - width/2, y - height/2,
+            x + width/2, y - height/2,
+            x + width/2, y + height/2,
+            x - width/2, y - height/2,
+            x + width/2, y + height/2,
+            x - width/2, y + height/2
+        };
+
+        float texCoords[] = {
+            0.0f, 1.0f,
+            1.0f, 1.0f,
+            1.0f, 0.0f,
+            0.0f, 1.0f,
+            1.0f, 0.0f,
+            0.0f, 0.0f
+        };
+
+        glBindTexture(GL_TEXTURE_2D, icon);
+        glVertexAttribPointer(program->positionAttribute, 2, GL_FLOAT, false, 0, vertices);
+        glEnableVertexAttribArray(program->positionAttribute);
+        glVertexAttribPointer(program->texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);
+        glEnableVertexAttribArray(program->texCoordAttribute);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glDisableVertexAttribArray(program->positionAttribute);
+        glDisableVertexAttribArray(program->texCoordAttribute);
+    }
 }
+

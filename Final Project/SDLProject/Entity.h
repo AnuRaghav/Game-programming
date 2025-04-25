@@ -20,13 +20,13 @@ enum SampleType {
     tv1,
     fireplace2,
     tree3,
-    a4,
-    a5,
-    a6,
-    a7,
-    a8,
-    a9,
-    a10,
+    frog4,
+    door5,
+    microwave6,
+    baloon7,
+    piano8,
+    guitar9,
+    drums10,
     none
 };
 

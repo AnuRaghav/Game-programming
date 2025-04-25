@@ -3,20 +3,48 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "level1.tmx",
     "expandedProjectPaths": [
+        "."
     ],
     "fileStates": {
+        "": {
+            "scaleInDock": 1
+        },
+        "global.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 2.94
+        },
+        "globalbuild.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 2.94
+        },
+        "level1.tmx": {
+            "scale": 2,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 231.25,
+                "y": 148
+            }
+        }
     },
     "last.exportedFilePath": "/Users/anuraghav/Desktop/College Assignments and Textbooks/4th sem/Game Programming/Game-programming/Final Project/assets/tiled",
     "last.imagePath": "/Users/anuraghav/Desktop/College Assignments and Textbooks/4th sem/Game Programming/Game-programming/Final Project/assets/tiled",
     "map.lastUsedExportFilter": "All Files (*)",
+    "map.lastUsedFormat": "tmx",
     "map.tileHeight": 16,
     "map.tileWidth": 16,
     "openFiles": [
+        "globalbuild.tsx",
+        "global.tsx",
+        "level1.tmx"
     ],
     "project": "cs3113 final.tiled-project",
     "recentFiles": [
+        "globalbuild.tsx",
+        "global.tsx",
+        "level1.tmx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {
