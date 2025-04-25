@@ -1,8 +1,9 @@
+#include <cstdlib>
 #include "Level1.h"
 #define LEVEL1_WIDTH 30
 #define LEVEL1_HEIGHT 20
 
-#define LEVEL1_ENEMY_COUNT 1
+#define MAX_ENEMIES 8
 using namespace std;
 
 static GLuint backgroundTextureID;
@@ -55,6 +56,29 @@ int level1_furnitureData[] = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
 };
 
+int level1_sampleData[] = {
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+};
+
 void Level1::Initialize(int numLives) {
     
     state.nextScene = -1;
@@ -95,13 +119,12 @@ void Level1::Initialize(int numLives) {
     
     state.player->jumpPower = 7.0f;
     
-    state.enemies = new Entity[LEVEL1_ENEMY_COUNT];
-    
-    
+    state.enemies = new Entity[MAX_ENEMIES];
+
     GLuint suitTextureID = Util::LoadTexture("suit.png");
-    
-    for (int i = 0; i < LEVEL1_ENEMY_COUNT; ++i) {
-        state.enemies[i].isActive = true;
+
+    for (int i = 0; i < MAX_ENEMIES; ++i) {
+        state.enemies[i].isActive = false; // Initially inactive
         state.enemies[i].entityType = SUIT;
         state.enemies[i].textureID = suitTextureID;
         state.enemies[i].aiType = SUIT_AI;
@@ -130,19 +153,20 @@ void Level1::Initialize(int numLives) {
     }
 }
 void Level1::Update(float deltaTime) {
-    state.player->Update(deltaTime, state.player, state.enemies, LEVEL1_ENEMY_COUNT, state.map);
-    for (int i = 0; i < LEVEL1_ENEMY_COUNT; ++i) {
-        state.enemies[i].Update(deltaTime, state.player, state.enemies, LEVEL1_ENEMY_COUNT, state.map);
+    state.player->Update(deltaTime, state.player, state.enemies, MAX_ENEMIES, state.map);
+    for (int i = 0; i < MAX_ENEMIES; ++i) {
+        state.enemies[i].Update(deltaTime, state.player, state.enemies, MAX_ENEMIES, state.map);
         // Attack logic: if player is attacking and within range, "kill" enemy
-        if (state.player->animIndices == state.player->animAttackRight ||
-            state.player->animIndices == state.player->animAttackLeft) {
+        if (state.enemies[i].isActive &&
+            (state.player->animIndices == state.player->animAttackRight ||
+             state.player->animIndices == state.player->animAttackLeft)) {
             float dist = glm::distance(state.player->position, state.enemies[i].position);
             if (dist < 0.5f) { // Attack range threshold
                 state.enemies[i].isActive = false; // Enemy dies
             }
         }
     }
-    
+
     if (!state.player->isActive && state.player->numLives > 0) {
         state.player->numLives -= 1;
 
@@ -154,7 +178,7 @@ void Level1::Update(float deltaTime) {
             state.player->isActive = true;
 
             // Reset enemies
-            for (int i = 0; i < LEVEL1_ENEMY_COUNT; ++i) {
+            for (int i = 0; i < MAX_ENEMIES; ++i) {
                 state.enemies[i].isAttacking = false;
                 state.enemies[i].animIndex = 0;
                 state.enemies[i].animTime = 0.0f;
@@ -164,10 +188,32 @@ void Level1::Update(float deltaTime) {
             state.nextScene = 4;
         }
     }
-  
-//    if (state.player->position.x >= 10 && state.player->position.y <= -3) {
-//        state.nextScene = 2;
-//    }
+
+    // Wave logic
+    int expectedEnemies = pow(2, currentWave - 1); // 1, 2, 4, 8
+    int activeEnemies = 0;
+
+    for (int i = 0; i < MAX_ENEMIES; ++i) {
+        if (state.enemies[i].isActive) activeEnemies++;
+    }
+
+    if (activeEnemies == 0 && currentWave <= 4) {
+        waveDelayTimer += deltaTime;
+        if (waveDelayTimer > 2.0f) { // 2 seconds between waves
+            for (int i = 0, spawned = 0; i < MAX_ENEMIES && spawned < expectedEnemies; ++i) {
+                if (!state.enemies[i].isActive) {
+                    state.enemies[i].isActive = true;
+                    // Random spawn within valid refined area (X: 10 to 20, Y: -15 to -10)
+                    float spawnX = 10.0f + static_cast<float>(rand() % 13);
+                    float spawnY = -12.0f + static_cast<float>(rand() % 3);
+                    state.enemies[i].position = glm::vec3(spawnX, spawnY, 0);
+                    spawned++;
+                }
+            }
+            currentWave++;
+            waveDelayTimer = 0.0f;
+        }
+    }
 }
 void Level1::Render(ShaderProgram *program) {
     glClearColor(0.5f, 0.8f, 1.0f, 1.0f);
@@ -177,7 +223,7 @@ void Level1::Render(ShaderProgram *program) {
     Util::DrawText(program, Util::LoadTexture("font1.png"), "Lives " + std::to_string(state.player->numLives), 0.5f, -0.1f, glm::vec3(0.2, -2.5, 0));
     state.map->Render(program);
     state.player->Render(program);
-    for (int i = 0; i < LEVEL1_ENEMY_COUNT; ++i) {
+    for (int i = 0; i < MAX_ENEMIES; ++i) {
         state.enemies[i].Render(program);
     }
 }

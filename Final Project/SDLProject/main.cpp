@@ -150,11 +150,15 @@ void ProcessInput() {
     
     const Uint8 *keys = SDL_GetKeyboardState(NULL);
 
-    bool usingItem = keys[SDL_SCANCODE_E];
     static bool rPressedLastFrame = false;
     bool rPressed = keys[SDL_SCANCODE_R];
     bool attackTriggered = rPressed && !rPressedLastFrame;
     rPressedLastFrame = rPressed;
+
+    static bool ePressedLastFrame = false;
+    bool ePressed = keys[SDL_SCANCODE_E];
+    bool useItemTriggered = ePressed && !ePressedLastFrame;
+    ePressedLastFrame = ePressed;
 
     if (attackTriggered && !currentScene->state.player->isAttacking) {
         currentScene->state.player->isAttacking = true;
@@ -166,14 +170,24 @@ void ProcessInput() {
         currentScene->state.player->animFrames = 4;
     }
 
+    if (useItemTriggered && !currentScene->state.player->isUsingItem) {
+        
+        currentScene->state.player->isUsingItem = true;
+        currentScene->state.player->animIndex = 0;
+        currentScene->state.player->animTime = 0.0f;
+        currentScene->state.player->animIndices = currentScene->state.player->facingLeft
+            ? currentScene->state.player->animUseItemLeft
+            : currentScene->state.player->animUseItemRight;
+        currentScene->state.player->animFrames = 5;
+
+        
+    }
+
     if (keys[SDL_SCANCODE_LEFT]) {
         currentScene->state.player->movement.x = -1.0f;
         currentScene->state.player->facingLeft = true;
-        if (currentScene->state.player->isAttacking) {
-            // Keep current attack animation
-        } else if (usingItem) {
-            currentScene->state.player->animIndices = currentScene->state.player->animUseItemLeft;
-            currentScene->state.player->animFrames = 8;
+        if (currentScene->state.player->isAttacking || currentScene->state.player->isUsingItem) {
+            // Keep current attack or use item animation
         } else {
             currentScene->state.player->animIndices = currentScene->state.player->animLeft;
             currentScene->state.player->animFrames = 10;
@@ -182,11 +196,8 @@ void ProcessInput() {
     else if (keys[SDL_SCANCODE_RIGHT]) {
         currentScene->state.player->movement.x = 1.0f;
         currentScene->state.player->facingLeft = false;
-        if (currentScene->state.player->isAttacking) {
-            // Keep current attack animation
-        } else if (usingItem) {
-            currentScene->state.player->animIndices = currentScene->state.player->animUseItemRight;
-            currentScene->state.player->animFrames = 8;
+        if (currentScene->state.player->isAttacking || currentScene->state.player->isUsingItem) {
+            // Keep current attack or use item animation
         } else {
             currentScene->state.player->animIndices = currentScene->state.player->animRight;
             currentScene->state.player->animFrames = 10;
@@ -199,7 +210,8 @@ void ProcessInput() {
         currentScene->state.player->movement.y = 1.0f;
     }
 
-    if (currentScene->state.player->movement.x == 0 && currentScene->state.player->movement.y == 0 && !currentScene->state.player->isAttacking) {
+    if (currentScene->state.player->movement.x == 0 && currentScene->state.player->movement.y == 0 &&
+        !currentScene->state.player->isAttacking && !currentScene->state.player->isUsingItem) {
         if (currentScene->state.player->facingLeft) {
             currentScene->state.player->animIndices = currentScene->state.player->animIdleLeft;
         } else {

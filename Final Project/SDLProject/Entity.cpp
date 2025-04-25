@@ -276,19 +276,28 @@ void Entity::Update(float deltaTime, Entity *player, Entity *objects, int object
 
     if (animIndices != NULL) {
         animTime += deltaTime;
+    
+
         if (animTime >= 0.1f) {
             animTime = 0.0f;
             animIndex++;
+          
+
             if (animIndex >= animFrames) {
                 if (isAttacking) {
+               
                     isAttacking = false;
+                }
+                if (isUsingItem) {
+           
+                    isUsingItem = false;
                 }
                 animIndex = 0;
             }
         }
     }
 
-    if (!isAttacking && movement.x == 0 && movement.y == 0) {
+    if (!isAttacking &&!isUsingItem && movement.x == 0 && movement.y == 0) {
         if (facingLeft && animIndices != animIdleLeft) {
             animIndices = animIdleLeft;
             animFrames = 8;
@@ -367,6 +376,7 @@ void Entity::Render(ShaderProgram *program) {
     program->SetModelMatrix(modelMatrix);
     
     if (animIndices != NULL) {
+        
         DrawSpriteFromTextureAtlas(program, textureID, animIndices[animIndex]);
         return;
     }
