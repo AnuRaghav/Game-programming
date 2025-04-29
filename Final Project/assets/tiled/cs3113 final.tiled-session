@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "level1.tmx",
+    "activeFile": "level3.tmx",
     "expandedProjectPaths": [
         "."
     ],
@@ -13,7 +13,7 @@
         },
         "global.tsx": {
             "dynamicWrapping": false,
-            "scaleInDock": 1,
+            "scaleInDock": 0.7972,
             "scaleInEditor": 2.94
         },
         "globalbuild.tsx": {
@@ -22,10 +22,26 @@
         },
         "level1.tmx": {
             "scale": 2,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 244.25,
+                "y": 162.75
+            }
+        },
+        "level2.tmx": {
+            "scale": 2.78,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 266.25,
-                "y": 201.25
+                "x": 294.78417266187057,
+                "y": 179.31654676258995
+            }
+        },
+        "level3.tmx": {
+            "scale": 2.8991,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 238.1773653892588,
+                "y": 156.0829222862268
             }
         }
     },
@@ -38,13 +54,17 @@
     "openFiles": [
         "globalbuild.tsx",
         "global.tsx",
-        "level1.tmx"
+        "level1.tmx",
+        "level2.tmx",
+        "level3.tmx"
     ],
     "project": "cs3113 final.tiled-project",
     "recentFiles": [
         "globalbuild.tsx",
         "global.tsx",
-        "level1.tmx"
+        "level1.tmx",
+        "level2.tmx",
+        "level3.tmx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {

@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <vector>
 #include "level2.h"
+#include <SDL_mixer.h>
 #define LEVEL2_WIDTH 30
 #define LEVEL2_HEIGHT 20
 
@@ -9,7 +10,8 @@ using namespace std;
 
 static GLuint backgroundTextureID;
 
-extern GLuint sampleIcons[10];
+extern GLuint sampleIcons2[10];
+Mix_Chunk* sampleSounds_Level2[4];
 
 
 int level2_data[] = {
@@ -65,18 +67,18 @@ int level2_sampleData[] = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  4, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  5, -1, -1, -1, -1,  6, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1,  7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -84,9 +86,17 @@ int level2_sampleData[] = {
 };
 
 void Level2::Initialize(int numLives) {
-    
+    // Ensure audio system is active before loading/playing sounds
+    if (!Mix_QuerySpec(NULL, NULL, NULL)) {
+        if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096) == -1) {
+            std::cout << "Mix_OpenAudio failed in Level2: " << Mix_GetError() << std::endl;
+        } else {
+            std::cout << "Audio system reinitialized in Level2." << std::endl;
+        }
+    }
+
     state.nextScene = -1;
-    
+
     // Use global.png as the tileset
     GLuint mapTextureID = Util::LoadTexture("global.png");
     // Map uses 16x16 tiles in a 4320x3440 tileset: 270x215 tiles
@@ -126,14 +136,32 @@ void Level2::Initialize(int numLives) {
     state.enemies = new Entity[MAX_ENEMIES];
 
     GLuint suitTextureID = Util::LoadTexture("suit.png");
+    
+    sampleIcons2[0] = Util::LoadTexture("tv copy.png");
+    sampleIcons2[1] = Util::LoadTexture("fireplace copy.png");
+    sampleIcons2[2] = Util::LoadTexture("tree copy.png");
+    sampleIcons2[3] = Util::LoadTexture("frog copy.png");
+    sampleIcons2[4] = Util::LoadTexture("door copy.png");
+    sampleIcons2[5] = Util::LoadTexture("microwave copy.png");
+    sampleIcons2[6] = Util::LoadTexture("balloon copy.png");
+    sampleIcons2[7] = Util::LoadTexture("piano copy.png");
+    sampleIcons2[8] = Util::LoadTexture("guitar copy.png");
+    sampleIcons2[9] = Util::LoadTexture("drums copy.png");
+
+  
+    sampleSounds_Level2[0] = Mix_LoadWAV("4.wav");
+    sampleSounds_Level2[1] = Mix_LoadWAV("5.wav");
+    sampleSounds_Level2[2] = Mix_LoadWAV("6.wav");
+    sampleSounds_Level2[3] = Mix_LoadWAV("7.wav");
+
 
     for (int i = 0; i < MAX_ENEMIES; ++i) {
-        state.enemies[i].isActive = false; // Initially inactive
+        state.enemies[i].isActive = false;
         state.enemies[i].entityType = SUIT;
         state.enemies[i].textureID = suitTextureID;
         state.enemies[i].aiType = SUIT_AI;
 
-        // Assign enemy animation arrays (each with their own new int[])
+       
         state.enemies[i].animRight = new int[10]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
         state.enemies[i].animLeft = new int[10]{10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
         state.enemies[i].animIdle = new int[10]{20, 21, 22, 23, 24, 25, 26, 27, 28, 29};
@@ -157,17 +185,7 @@ void Level2::Initialize(int numLives) {
     }
 
     GLuint sampleTextureID = Util::LoadTexture("sample.png");
-    
-    sampleIcons[0] = Util::LoadTexture("tv.png");
-    sampleIcons[1] = Util::LoadTexture("fireplace.png");
-    sampleIcons[2] = Util::LoadTexture("tree.png");
-    sampleIcons[3] = Util::LoadTexture("frog.png");
-    sampleIcons[4] = Util::LoadTexture("door.png");
-    sampleIcons[5] = Util::LoadTexture("microwave.png");
-    sampleIcons[6] = Util::LoadTexture("balloon.png");
-    sampleIcons[7] = Util::LoadTexture("piano.png");
-    sampleIcons[8] = Util::LoadTexture("guitar.png");
-    sampleIcons[9] = Util::LoadTexture("drums.png");
+
     for (int i = 0; i < LEVEL2_WIDTH * LEVEL2_HEIGHT; ++i) {
         if (level2_sampleData[i] != -1) {
             cout << "sample" << endl;
@@ -227,6 +245,15 @@ void Level2::Update(float deltaTime) {
             if (dist < 1.0f && useCounter >= 3) {
                 sample.isCollected = true;
                 state.samples.push_back(sample);
+                
+                if (sample.sampleType == frog4)
+                    Mix_PlayChannel(-1, sampleSounds_Level2[0], 0);
+                else if (sample.sampleType == door5)
+                    Mix_PlayChannel(-1, sampleSounds_Level2[1], 0);
+                else if (sample.sampleType == microwave6)
+                    Mix_PlayChannel(-1, sampleSounds_Level2[2], 0);
+                else if (sample.sampleType == baloon7)
+                    Mix_PlayChannel(-1, sampleSounds_Level2[3], 0);
                 useCounter = 0;
                 // Optional: Add sound or visual feedback here
             }
@@ -270,7 +297,7 @@ void Level2::Update(float deltaTime) {
             for (int i = 0, spawned = 0; i < MAX_ENEMIES && spawned < expectedEnemies; ++i) {
                 if (!state.enemies[i].isActive) {
                     state.enemies[i].isActive = true;
-                    // Random spawn within valid refined area (X: 10 to 20, Y: -15 to -10)
+                    
                     float spawnX = 10.0f + static_cast<float>(rand() % 16);
                     float spawnY = -11.0f + static_cast<float>(rand() % 2);
                     state.enemies[i].position = glm::vec3(spawnX, spawnY, 0);
@@ -280,6 +307,9 @@ void Level2::Update(float deltaTime) {
             currentWave++;
             waveDelayTimer = 0.0f;
         }
+    }
+    else if (activeEnemies == 0 && currentWave > 5) {
+        state.nextScene = 3;
     }
 }
 void Level2::Render(ShaderProgram *program) {
@@ -298,9 +328,19 @@ void Level2::Render(ShaderProgram *program) {
         state.enemies[i].Render(program);
     }
     
+    
+    glUseProgram(program->programID);
+    program->SetModelMatrix(glm::mat4(1.0f));
+
     for (int i = 0; i < state.samples.size(); ++i) {
-        int sampleIndex = static_cast<int>(state.samples[i].sampleType); // enum to index
-        GLuint icon = sampleIcons[sampleIndex];
+        int sampleIndex = i+3; // enum to index
+        GLuint icon = sampleIcons2[sampleIndex];
+
+        
+        if (icon == 0) {
+            std::cout << "Missing or unloaded icon for sample " << i << " (type: " << sampleIndex << ")" << std::endl;
+            continue;
+        }
 
         float x = -4.5f + (i * 0.8f);
         float y = 3.3f;

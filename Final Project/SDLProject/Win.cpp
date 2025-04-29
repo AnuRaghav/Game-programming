@@ -4,7 +4,7 @@ void Win::Initialize(int numLives) {
     state.nextScene = -1;
     state.player = new Entity();
         state.player->entityType = PLAYER;
-        state.player->position = glm::vec3(5, 0, 0);
+        state.player->position = glm::vec3(5, -5, 0);
         state.player->movement = glm::vec3(0);
         state.player->acceleration = glm::vec3(0, 0, 0);
         state.player->speed = 3.0f;

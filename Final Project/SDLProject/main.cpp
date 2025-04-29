@@ -39,8 +39,9 @@
 
 #include "Win.h"
 
-GLuint sampleIcons[10]; // Defined globally so it can be shared across levels
-
+GLuint sampleIcons[10];
+GLuint sampleIcons2[10];
+Mix_Chunk* sampleSounds[10];
 using namespace std;
 
 SDL_Window* displayWindow;
@@ -66,7 +67,7 @@ void SwitchToScene(Scene *scene) {
 
 void Initialize() {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
-    displayWindow = SDL_CreateWindow("Platformer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL);
+    displayWindow = SDL_CreateWindow("feline studio", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL);
     SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
     SDL_GL_MakeCurrent(displayWindow, context);
     
@@ -92,10 +93,9 @@ void Initialize() {
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
  
-    Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
-    music = Mix_LoadMUS("time_for_adventure.mp3");
-    Mix_PlayMusic(music, -1);
-    Mix_VolumeMusic(MIX_MAX_VOLUME);
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096) == -1) {
+        std::cout << "Mix_OpenAudio failed: " << Mix_GetError() << std::endl;
+    }
     
     jump = Mix_LoadWAV("jump.wav");
     

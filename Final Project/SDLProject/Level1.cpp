@@ -1,3 +1,4 @@
+#include <SDL_mixer.h>
 #include <cstdlib>
 #include <vector>
 #include "Level1.h"
@@ -10,6 +11,8 @@ using namespace std;
 static GLuint backgroundTextureID;
 
 extern GLuint sampleIcons[10];
+
+ extern Mix_Chunk* sampleSounds[10];
 
 
 int level1_data[] = {
@@ -86,11 +89,11 @@ void Level1::Initialize(int numLives) {
     
     state.nextScene = -1;
     
-    // Use global.png as the tileset
+    
     GLuint mapTextureID = Util::LoadTexture("global.png");
     // Map uses 16x16 tiles in a 4320x3440 tileset: 270x215 tiles
     state.map = new Map(LEVEL1_WIDTH, LEVEL1_HEIGHT, level1_data, level1_furnitureData, mapTextureID, 1.0f, 270, 215);
-    // Initialize Player
+    
     state.player = new Entity();
     state.player->entityType = PLAYER;
     state.player->position = glm::vec3(10, -10, 0);
@@ -167,6 +170,12 @@ void Level1::Initialize(int numLives) {
     sampleIcons[7] = Util::LoadTexture("piano.png");
     sampleIcons[8] = Util::LoadTexture("guitar.png");
     sampleIcons[9] = Util::LoadTexture("drums.png");
+
+    // Load sample sounds
+    sampleSounds[0] = Mix_LoadWAV("1.wav");
+    sampleSounds[1] = Mix_LoadWAV("2.wav");
+    sampleSounds[2] = Mix_LoadWAV("3.wav");
+    
     for (int i = 0; i < LEVEL1_WIDTH * LEVEL1_HEIGHT; ++i) {
         if (level1_sampleData[i] != -1) {
             cout << "sample" << endl;
@@ -231,7 +240,11 @@ void Level1::Update(float deltaTime) {
                 state.samples.push_back(collected);
                 std::cout << "Collected sample! Total collected: " << state.samples.size() << std::endl;
                 useCounter = 0;
-                // Optional: Add sound or visual feedback here
+                // Play corresponding sample sound
+                if (sample.sampleType >= tv1 && sample.sampleType <= drums10) {
+                    int soundIndex = static_cast<int>(sample.sampleType);
+                    Mix_PlayChannel(-1, sampleSounds[soundIndex], 0);
+                }
             }
         }
     }
