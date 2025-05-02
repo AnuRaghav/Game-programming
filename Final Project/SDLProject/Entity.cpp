@@ -18,7 +18,7 @@ Entity::Entity()
     animCols = 10;
     animRows = 8;
 
-    // Animation arrays will be assigned externally
+    
     animRight = nullptr;
     animLeft = nullptr;
     animIdle = nullptr;
@@ -92,7 +92,7 @@ void Entity::CheckEnemyCollided(Entity *enemies, int enemyCount) {
     collidedLeft = false;
     collidedRight = false;
     collidedTop = false;
-    // Prevent collision glitches by skipping actual resolution with enemies
+    
     if (collidedBottom == true) {
         for (int i = 0; i < enemyCount; ++i) {
             if (enemies[i].collidedTop == true) {
@@ -101,12 +101,12 @@ void Entity::CheckEnemyCollided(Entity *enemies, int enemyCount) {
         }
     }
     
-    // Legacy collision logic removed for clarity
+    
 }
 
 void Entity::CheckCollisionsY(Map *map)
 {
-    // Probes for tiles
+    
     glm::vec3 top = glm::vec3(position.x, position.y + (height / 2), position.z);
     glm::vec3 top_left = glm::vec3(position.x - (width / 2), position.y + (height / 2), position.z);
     glm::vec3 top_right = glm::vec3(position.x + (width / 2), position.y + (height / 2), position.z);
@@ -195,14 +195,14 @@ void Entity::AISuit(Entity *player) {
     float distance = glm::distance(position, player->position);
 
     if (isAttacking) {
-        // Do not update movement or animation while attack is playing
+        
         movement = glm::vec3(0);
         return;
     }
 
 
     if (distance < 0.5f) {
-        // In attack range
+        
         movement = glm::vec3(0);
         if (!isAttacking) {
             isAttacking = true;
@@ -217,8 +217,7 @@ void Entity::AISuit(Entity *player) {
 
         if (!hasAttacked && player->isActive) {
             attackFrameCounter++;
-//            cout << attackFrameCounter << endl;
-            if (attackFrameCounter >= 3) {
+            if (attackFrameCounter >= 2) {
                 player->isActive = false;
                 hasAttacked = true;
                 attackFrameCounter = 0;
@@ -226,17 +225,15 @@ void Entity::AISuit(Entity *player) {
         }
 
     } else if (distance < 4.0f) {
-        // Chase the player
         isAttacking = false;
         hasAttacked = false;
         attackStartTime = -1.0f;
         attackFrameCounter = 0;
 
-        // Move toward player in both x and y directions
+        
         glm::vec3 direction = glm::normalize(player->position - position);
         movement = glm::vec3(direction.x, direction.y, 0);
 
-        // Update facing direction and animation
         if (movement.x < 0) {
             animIndices = animLeft;
             animFrames = 10;
@@ -248,7 +245,7 @@ void Entity::AISuit(Entity *player) {
         }
 
     } else {
-        // Idle if far
+        
         isAttacking = false;
         hasAttacked = false;
         attackStartTime = -1.0f;
@@ -272,7 +269,6 @@ void Entity::Update(float deltaTime, Entity *player, Entity *objects, int object
     pitLeft = false;
     pitRight = false;
 
-    // Let SUIT AI handle all movement and animation logic
     if (entityType == SUIT) {
         AI(player);
     }
@@ -335,7 +331,7 @@ void Entity::Update(float deltaTime, Entity *player, Entity *objects, int object
         CheckEnemyCollided(objects, objectCount);
     }
 
-    // Removed: player deactivation on hitCounter >= 3
+    
 
     modelMatrix = glm::mat4(1.0f);
     modelMatrix = glm::translate(modelMatrix, position);
@@ -373,12 +369,15 @@ void Entity::Render(ShaderProgram *program) {
         return;
     }
     
+    
     if (entityType == SAMPLE && isCollected) return;
-  
+    if (entityType == UI_ICON) return;
+    
     modelMatrix = glm::mat4(1.0f);
     modelMatrix = glm::translate(modelMatrix, position);
     modelMatrix = glm::scale(modelMatrix, glm::vec3(width, height, 1.0f));
     program->SetModelMatrix(modelMatrix);
+    
     
     if (animIndices != NULL) {
         

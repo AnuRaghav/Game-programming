@@ -9,10 +9,10 @@
 using namespace std;
 
 static GLuint backgroundTextureID;
+static Mix_Chunk* attackSound = nullptr;
 
-extern GLuint sampleIcons[10];
-
- extern Mix_Chunk* sampleSounds[10];
+extern GLuint sampleIcons[12];
+extern Mix_Chunk* sampleSounds[10];
 
 
 int level3_data[] = {
@@ -71,11 +71,11 @@ int level3_sampleData[] = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  9, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 9, -1, -1, -1, 10, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 11, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -125,6 +125,12 @@ void Level3::Initialize(int numLives) {
     state.player->width = 0.8f;
     
     state.player->jumpPower = 7.0f;
+
+    
+    attackSound = Mix_LoadWAV("attack.wav");
+    if (!attackSound) {
+        std::cout << "Failed to load attack.wav: " << Mix_GetError() << std::endl;
+    }
     
     state.enemies = new Entity[MAX_ENEMIES];
 
@@ -160,47 +166,34 @@ void Level3::Initialize(int numLives) {
     }
 
     GLuint sampleTextureID = Util::LoadTexture("sample.png");
+    GLuint transparent = Util::LoadTexture("transparent.png");
     
-    sampleIcons[0] = Util::LoadTexture("tv.png");
-    sampleIcons[1] = Util::LoadTexture("fireplace.png");
-    sampleIcons[2] = Util::LoadTexture("tree.png");
-    sampleIcons[3] = Util::LoadTexture("frog.png");
-    sampleIcons[4] = Util::LoadTexture("door.png");
-    sampleIcons[5] = Util::LoadTexture("microwave.png");
-    sampleIcons[6] = Util::LoadTexture("balloon.png");
-    sampleIcons[7] = Util::LoadTexture("piano.png");
-    sampleIcons[8] = Util::LoadTexture("guitar.png");
-    sampleIcons[9] = Util::LoadTexture("drums.png");
-
     
-    sampleSounds[7] = Mix_LoadWAV("8.wav");
-    sampleSounds[8] = Mix_LoadWAV("9.wav");
-    sampleSounds[9] = Mix_LoadWAV("10.wav");
     
     for (int i = 0; i < level3_WIDTH * level3_HEIGHT; ++i) {
-        if (level3_sampleData[i] != -1) {
+        if (level3_sampleData[i] != -1 ){
             cout << "sample" << endl;
             Entity sample;
             sample.entityType = SAMPLE;
             if (sample.textureID == 0) cout << "sample texture missing!" << endl;
             int x = i % level3_WIDTH;
             int y = i / level3_WIDTH;
-            if (level3_sampleData[i] == 1)
-                sample.sampleType = tv1;
-            else if (level3_sampleData[i] == 2)
-                sample.sampleType = fireplace2;
-            else if (level3_sampleData[i] == 3)
-                sample.sampleType = tree3;
+            sample.sampleType = static_cast<SampleType>(level3_sampleData[i]);
             float xPos = x * 1.0f;
             float yPos = -y * 1.0f;
             sample.position = glm::vec3(xPos, yPos, 0);
-            sample.textureID = sampleTextureID;
+            if (level3_sampleData[i] < 10)
+                sample.textureID = sampleTextureID;
+            else
+                sample.textureID = transparent;
+            
+            cout << sample.textureID << endl;
             sample.width = 0.8f;
             sample.height = 0.8f;
             sample.isCollected = false;
             sample.isActive = true;
             localSamples.push_back(sample);
-            cout << "Sample position: " << sample.position.x << ", " << sample.position.y << endl;
+            
         }
     }
 }
@@ -214,9 +207,24 @@ void Level3::Update(float deltaTime) {
              state.player->animIndices == state.player->animAttackLeft)) {
             float dist = glm::distance(state.player->position, state.enemies[i].position);
             if (dist < 0.5f) {
-                state.enemies[i].isActive = false; // Enemy dies
+                state.enemies[i].isActive = false; 
             }
         }
+    }
+
+    
+    static bool attackSoundPlayed = false;
+
+    if (!attackSoundPlayed &&
+        (state.player->animIndices == state.player->animAttackRight ||
+         state.player->animIndices == state.player->animAttackLeft)) {
+        if (attackSound) Mix_PlayChannel(-1, attackSound, 0);
+        attackSoundPlayed = true;
+    }
+
+    if (state.player->animIndices != state.player->animAttackRight &&
+        state.player->animIndices != state.player->animAttackLeft) {
+        attackSoundPlayed = false;
     }
 
     
@@ -239,12 +247,20 @@ void Level3::Update(float deltaTime) {
                 collected.isActive = true;
                 collected.position = glm::vec3(0);
                 state.samples.push_back(collected);
+                Entity iconEntity;
+                iconEntity.entityType = UI_ICON;
+                iconEntity.textureID = sampleIcons[static_cast<int>(sample.sampleType)];
+                iconEntity.width = 0.6f;
+                iconEntity.height = 0.6f;
+                iconEntity.isActive = true;
+                iconEntity.position = glm::vec3(-4.5f + (state.uiIcons.size() * 0.8f), 3.3f, 0);
+                state.uiIcons.push_back(iconEntity);
                 std::cout << "Collected sample! Total collected: " << state.samples.size() << std::endl;
                 useCounter = 0;
                 
-                if (sample.sampleType >= piano8 && sample.sampleType <= drums10) {
+                if (sample.sampleType >= tv1 && sample.sampleType <= drums10) {
                     int soundIndex = static_cast<int>(sample.sampleType);
-                    Mix_PlayChannel(-1, sampleSounds[soundIndex-8], 0);
+                    Mix_PlayChannel(-1, sampleSounds[soundIndex], 0);
                 }
             }
         }
@@ -298,8 +314,8 @@ void Level3::Update(float deltaTime) {
             waveDelayTimer = 0.0f;
         }
     } else if (activeEnemies == 0 && currentWave > 5) {
-        // All waves complete and no enemies remain
-        state.nextScene = 5; // Switch to Level 5 (final scene)
+        
+        state.nextScene = 5;
     }
 }
 void Level3::Render(ShaderProgram *program) {
@@ -318,23 +334,26 @@ void Level3::Render(ShaderProgram *program) {
         state.enemies[i].Render(program);
     }
     
-    for (int i = 0; i < state.samples.size(); ++i) {
-        int sampleIndex = static_cast<int>(state.samples[i].sampleType); // enum to index
-        GLuint icon = sampleIcons[sampleIndex];
+    
+    program->SetProjectionMatrix(glm::ortho(-5.0f, 5.0f, -3.75f, 3.75f, -1.0f, 1.0f));
+    program->SetViewMatrix(glm::mat4(1.0f));
+    program->SetModelMatrix(glm::mat4(1.0f));
 
-        float x = -4.5f + (i * 0.8f);
+    for (int i = 0; i < state.uiIcons.size(); ++i) {
+        Entity& icon = state.uiIcons[i];
+
+        float x = -4.5f + i * 0.8f;
         float y = 3.3f;
-
         float width = 0.6f;
         float height = 0.6f;
 
         float vertices[] = {
-            x - width/2, y - height/2,
-            x + width/2, y - height/2,
-            x + width/2, y + height/2,
-            x - width/2, y - height/2,
-            x + width/2, y + height/2,
-            x - width/2, y + height/2
+            x - width / 2, y - height / 2,
+            x + width / 2, y - height / 2,
+            x + width / 2, y + height / 2,
+            x - width / 2, y - height / 2,
+            x + width / 2, y + height / 2,
+            x - width / 2, y + height / 2
         };
 
         float texCoords[] = {
@@ -346,7 +365,7 @@ void Level3::Render(ShaderProgram *program) {
             0.0f, 0.0f
         };
 
-        glBindTexture(GL_TEXTURE_2D, icon);
+        glBindTexture(GL_TEXTURE_2D, icon.textureID);
         glVertexAttribPointer(program->positionAttribute, 2, GL_FLOAT, false, 0, vertices);
         glEnableVertexAttribArray(program->positionAttribute);
         glVertexAttribPointer(program->texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);

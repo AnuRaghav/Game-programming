@@ -39,9 +39,8 @@
 
 #include "Win.h"
 
-GLuint sampleIcons[10];
-GLuint sampleIcons2[10];
-Mix_Chunk* sampleSounds[10];
+GLuint sampleIcons[12];
+Mix_Chunk* sampleSounds[10] = {0};
 using namespace std;
 
 SDL_Window* displayWindow;
@@ -96,8 +95,47 @@ void Initialize() {
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096) == -1) {
         std::cout << "Mix_OpenAudio failed: " << Mix_GetError() << std::endl;
     }
+    Mix_AllocateChannels(16);
+
     
+    music = Mix_LoadMUS("Xtal.wav");
+    if (music) {
+        Mix_PlayMusic(music, -1);
+        Mix_VolumeMusic(MIX_MAX_VOLUME / 4);  
+    } else {
+        std::cout << "Failed to load Xtal.wav: " << Mix_GetError() << std::endl;
+    }
+
     jump = Mix_LoadWAV("jump.wav");
+    sampleIcons[0] = Util::LoadTexture("tv.png");
+    sampleIcons[1] = Util::LoadTexture("fireplace.png");
+    sampleIcons[2] = Util::LoadTexture("tree.png");
+    sampleIcons[3] = Util::LoadTexture("frog.png");
+    sampleIcons[4] = Util::LoadTexture("door.png");
+    sampleIcons[5] = Util::LoadTexture("microwave.png");
+    sampleIcons[6] = Util::LoadTexture("balloon.png");
+    sampleIcons[7] = Util::LoadTexture("piano.png");
+    sampleIcons[8] = Util::LoadTexture("guitar.png");
+    sampleIcons[9] = Util::LoadTexture("drums.png");
+    sampleIcons[10] = Util::LoadTexture("bonus1.png");
+    sampleIcons[11] = Util::LoadTexture("bonus2.png");
+    
+    sampleSounds[0] = Mix_LoadWAV("1.wav");
+    sampleSounds[1] = Mix_LoadWAV("2.wav");
+    sampleSounds[2] = Mix_LoadWAV("3.wav");
+    sampleSounds[3] = Mix_LoadWAV("4.wav");
+    sampleSounds[4] = Mix_LoadWAV("5.wav");
+    sampleSounds[5] = Mix_LoadWAV("7.wav");
+    sampleSounds[6] = Mix_LoadWAV("6.wav");
+    sampleSounds[7] = Mix_LoadWAV("8.wav");
+    sampleSounds[8] = Mix_LoadWAV("9.wav");
+    sampleSounds[9] = Mix_LoadWAV("10.wav");
+    
+    
+    
+    for (int i = 0; i < 10; ++i) {
+        std::cout << "sampleIcons[" << i << "] = " << sampleIcons[i] << std::endl;
+    }
     
     sceneList[0] = new Menu();
     sceneList[1] = new Level1();
@@ -280,13 +318,22 @@ int main(int argc, char* argv[]) {
     while (gameIsRunning) {
         ProcessInput();
         Update();
-        
-        if (currentScene->state.nextScene >= 0) SwitchToScene(sceneList[currentScene->state.nextScene]);
+
+        if (currentScene->state.nextScene >= 0) {
+            int next = currentScene->state.nextScene;
+            sceneList[next]->state.uiIcons = currentScene->state.uiIcons;
+            sceneList[next]->state.samples = currentScene->state.samples;
+            if (next == 5 && Mix_PlayingMusic()) {
+                Mix_HaltMusic();
+            }
+            SwitchToScene(sceneList[next]);
+        }
         numLives = currentScene->state.player->numLives;
-        
+
         Render();
     }
     
     Shutdown();
     return 0;
 }
+

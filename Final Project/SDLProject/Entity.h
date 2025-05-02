@@ -13,7 +13,7 @@
 #include "ShaderProgram.h"
 #include "Map.h"
 
-enum EntityType { PLAYER, PLATFORM, SUIT , SAMPLE};
+enum EntityType { PLAYER, PLATFORM, SUIT , SAMPLE, UI_ICON};
 enum AIType { SUIT_AI };
 
 enum SampleType {
@@ -27,6 +27,8 @@ enum SampleType {
     piano8,
     guitar9,
     drums10,
+    bonus11,
+    bonus12,
     none
 };
 

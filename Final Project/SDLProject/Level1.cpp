@@ -10,9 +10,12 @@ using namespace std;
 
 static GLuint backgroundTextureID;
 
-extern GLuint sampleIcons[10];
+extern GLuint sampleIcons[12];
 
- extern Mix_Chunk* sampleSounds[10];
+extern Mix_Chunk* sampleSounds[10];
+
+
+static Mix_Chunk* attackSound = nullptr;
 
 
 int level1_data[] = {
@@ -87,11 +90,16 @@ int level1_sampleData[] = {
 
 void Level1::Initialize(int numLives) {
     
+    attackSound = Mix_LoadWAV("attack.wav");
+    if (!attackSound) {
+        std::cout << "Failed to load attack.mp3: " << Mix_GetError() << std::endl;
+    }
+    
     state.nextScene = -1;
     
     
     GLuint mapTextureID = Util::LoadTexture("global.png");
-    // Map uses 16x16 tiles in a 4320x3440 tileset: 270x215 tiles
+    //  16px x 16px tiles in a 4320x3440 tileset.. so yes, that is 270x215 tiles
     state.map = new Map(LEVEL1_WIDTH, LEVEL1_HEIGHT, level1_data, level1_furnitureData, mapTextureID, 1.0f, 270, 215);
     
     state.player = new Entity();
@@ -130,12 +138,12 @@ void Level1::Initialize(int numLives) {
     GLuint suitTextureID = Util::LoadTexture("suit.png");
 
     for (int i = 0; i < MAX_ENEMIES; ++i) {
-        state.enemies[i].isActive = false; // Initially inactive
+        state.enemies[i].isActive = false;
         state.enemies[i].entityType = SUIT;
         state.enemies[i].textureID = suitTextureID;
         state.enemies[i].aiType = SUIT_AI;
 
-        // Assign enemy animation arrays (each with their own new int[])
+        
         state.enemies[i].animRight = new int[10]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
         state.enemies[i].animLeft = new int[10]{10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
         state.enemies[i].animIdle = new int[10]{20, 21, 22, 23, 24, 25, 26, 27, 28, 29};
@@ -160,21 +168,7 @@ void Level1::Initialize(int numLives) {
 
     GLuint sampleTextureID = Util::LoadTexture("sample.png");
     
-    sampleIcons[0] = Util::LoadTexture("tv.png");
-    sampleIcons[1] = Util::LoadTexture("fireplace.png");
-    sampleIcons[2] = Util::LoadTexture("tree.png");
-    sampleIcons[3] = Util::LoadTexture("frog.png");
-    sampleIcons[4] = Util::LoadTexture("door.png");
-    sampleIcons[5] = Util::LoadTexture("microwave.png");
-    sampleIcons[6] = Util::LoadTexture("balloon.png");
-    sampleIcons[7] = Util::LoadTexture("piano.png");
-    sampleIcons[8] = Util::LoadTexture("guitar.png");
-    sampleIcons[9] = Util::LoadTexture("drums.png");
-
-    // Load sample sounds
-    sampleSounds[0] = Mix_LoadWAV("1.wav");
-    sampleSounds[1] = Mix_LoadWAV("2.wav");
-    sampleSounds[2] = Mix_LoadWAV("3.wav");
+    
     
     for (int i = 0; i < LEVEL1_WIDTH * LEVEL1_HEIGHT; ++i) {
         if (level1_sampleData[i] != -1) {
@@ -205,15 +199,30 @@ void Level1::Initialize(int numLives) {
 }
 void Level1::Update(float deltaTime) {
     state.player->Update(deltaTime, state.player, state.enemies, MAX_ENEMIES, state.map);
+    
+    
+    static bool attackSoundPlayed = false;
+    if (!attackSoundPlayed &&
+        (state.player->animIndices == state.player->animAttackRight ||
+         state.player->animIndices == state.player->animAttackLeft)) {
+        if (attackSound) Mix_PlayChannel(-1, attackSound, 0);
+        attackSoundPlayed = true;
+    }
+    if (state.player->animIndices != state.player->animAttackRight &&
+        state.player->animIndices != state.player->animAttackLeft) {
+        attackSoundPlayed = false;
+    }
+
+
     for (int i = 0; i < MAX_ENEMIES; ++i) {
         state.enemies[i].Update(deltaTime, state.player, state.enemies, MAX_ENEMIES, state.map);
-        // Attack logic: if player is attacking and within range, "kill" enemy
+        
         if (state.enemies[i].isActive &&
             (state.player->animIndices == state.player->animAttackRight ||
              state.player->animIndices == state.player->animAttackLeft)) {
             float dist = glm::distance(state.player->position, state.enemies[i].position);
-            if (dist < 0.5f) { // Attack range threshold
-                state.enemies[i].isActive = false; // Enemy dies
+            if (dist < 0.5f) {
+                state.enemies[i].isActive = false;
             }
         }
     }
@@ -239,8 +248,19 @@ void Level1::Update(float deltaTime) {
                 collected.position = glm::vec3(0);
                 state.samples.push_back(collected);
                 std::cout << "Collected sample! Total collected: " << state.samples.size() << std::endl;
+                
+                Entity iconEntity;
+                iconEntity.entityType = UI_ICON;
+                iconEntity.textureID = sampleIcons[static_cast<int>(sample.sampleType)];
+                iconEntity.width = 0.6f;
+                iconEntity.height = 0.6f;
+                iconEntity.isActive = true;
+                iconEntity.position = glm::vec3(-4.5f + (state.uiIcons.size() * 0.8f), 3.3f, 0);
+                cout << "size of the uiicons vector : " << state.uiIcons.size() << endl;
+                state.uiIcons.push_back(iconEntity);
+                
                 useCounter = 0;
-                // Play corresponding sample sound
+                
                 if (sample.sampleType >= tv1 && sample.sampleType <= drums10) {
                     int soundIndex = static_cast<int>(sample.sampleType);
                     Mix_PlayChannel(-1, sampleSounds[soundIndex], 0);
@@ -286,7 +306,7 @@ void Level1::Update(float deltaTime) {
             for (int i = 0, spawned = 0; i < MAX_ENEMIES && spawned < expectedEnemies; ++i) {
                 if (!state.enemies[i].isActive) {
                     state.enemies[i].isActive = true;
-                    // Random spawn within valid refined area (X: 10 to 20, Y: -15 to -10)
+                    
                     float spawnX = 10.0f + static_cast<float>(rand() % 13);
                     float spawnY = -12.0f + static_cast<float>(rand() % 3);
                     state.enemies[i].position = glm::vec3(spawnX, spawnY, 0);
@@ -297,8 +317,8 @@ void Level1::Update(float deltaTime) {
             waveDelayTimer = 0.0f;
         }
     } else if (activeEnemies == 0 && currentWave > 4) {
-        // All waves complete and no enemies remain
-        state.nextScene = 2; // Switch to Level 2
+        
+        state.nextScene = 2;
     }
 }
 void Level1::Render(ShaderProgram *program) {
@@ -316,24 +336,24 @@ void Level1::Render(ShaderProgram *program) {
     for (int i = 0; i < MAX_ENEMIES; ++i) {
         state.enemies[i].Render(program);
     }
-    
-    for (int i = 0; i < state.samples.size(); ++i) {
-        int sampleIndex = static_cast<int>(state.samples[i].sampleType); // enum to index
-        GLuint icon = sampleIcons[sampleIndex];
+    program->SetModelMatrix(glm::mat4(1.0f));
+    program->SetProjectionMatrix(glm::ortho(-5.0f, 5.0f, -3.75f, 3.75f, -1.0f, 1.0f));
+    program->SetViewMatrix(glm::mat4(1.0f));
+    for (int i = 0; i < state.uiIcons.size(); ++i) {
+        Entity& icon = state.uiIcons[i];
 
-        float x = -4.5f + (i * 0.8f);
+        float x = -4.5f + i * 0.8f;
         float y = 3.3f;
-
         float width = 0.6f;
         float height = 0.6f;
 
         float vertices[] = {
-            x - width/2, y - height/2,
-            x + width/2, y - height/2,
-            x + width/2, y + height/2,
-            x - width/2, y - height/2,
-            x + width/2, y + height/2,
-            x - width/2, y + height/2
+            x - width / 2, y - height / 2,
+            x + width / 2, y - height / 2,
+            x + width / 2, y + height / 2,
+            x - width / 2, y - height / 2,
+            x + width / 2, y + height / 2,
+            x - width / 2, y + height / 2
         };
 
         float texCoords[] = {
@@ -345,7 +365,7 @@ void Level1::Render(ShaderProgram *program) {
             0.0f, 0.0f
         };
 
-        glBindTexture(GL_TEXTURE_2D, icon);
+        glBindTexture(GL_TEXTURE_2D, icon.textureID);
         glVertexAttribPointer(program->positionAttribute, 2, GL_FLOAT, false, 0, vertices);
         glEnableVertexAttribArray(program->positionAttribute);
         glVertexAttribPointer(program->texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);

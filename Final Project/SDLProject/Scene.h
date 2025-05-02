@@ -19,6 +19,7 @@ struct GameState {
     Entity *enemies;
     int nextScene;
     std::vector<Entity> samples;
+    std::vector<Entity> uiIcons;
 };
 class Scene {
 public:

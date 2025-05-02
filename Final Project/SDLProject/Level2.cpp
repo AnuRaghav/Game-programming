@@ -1,7 +1,9 @@
+#include <iostream>
+#include <SDL_mixer.h>
+static Mix_Chunk* attackSound = nullptr;
 #include <cstdlib>
 #include <vector>
-#include "level2.h"
-#include <SDL_mixer.h>
+#include "Level2.h"
 #define LEVEL2_WIDTH 30
 #define LEVEL2_HEIGHT 20
 
@@ -10,8 +12,8 @@ using namespace std;
 
 static GLuint backgroundTextureID;
 
-extern GLuint sampleIcons2[10];
-Mix_Chunk* sampleSounds_Level2[4];
+extern GLuint sampleIcons[12];
+extern Mix_Chunk* sampleSounds[10];
 
 
 int level2_data[] = {
@@ -67,18 +69,18 @@ int level2_sampleData[] = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  4, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  5, -1, -1, -1, -1,  6, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  4, -1, -1, -1, -1,  5, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  3, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1,  7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1,  6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -86,22 +88,14 @@ int level2_sampleData[] = {
 };
 
 void Level2::Initialize(int numLives) {
-    // Ensure audio system is active before loading/playing sounds
-    if (!Mix_QuerySpec(NULL, NULL, NULL)) {
-        if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096) == -1) {
-            std::cout << "Mix_OpenAudio failed in Level2: " << Mix_GetError() << std::endl;
-        } else {
-            std::cout << "Audio system reinitialized in Level2." << std::endl;
-        }
-    }
 
     state.nextScene = -1;
 
-    // Use global.png as the tileset
+    
     GLuint mapTextureID = Util::LoadTexture("global.png");
-    // Map uses 16x16 tiles in a 4320x3440 tileset: 270x215 tiles
+    
     state.map = new Map(LEVEL2_WIDTH, LEVEL2_HEIGHT, level2_data, level2_furnitureData, mapTextureID, 1.0f, 270, 215);
-    // Initialize Player
+    
     state.player = new Entity();
     state.player->entityType = PLAYER;
     state.player->position = glm::vec3(15, -11, 0);
@@ -132,27 +126,16 @@ void Level2::Initialize(int numLives) {
     state.player->width = 0.8f;
     
     state.player->jumpPower = 7.0f;
+
+    
+    attackSound = Mix_LoadWAV("attack.wav");
+    if (!attackSound) {
+        std::cout << "Failed to load attack.wav: " << Mix_GetError() << std::endl;
+    }
     
     state.enemies = new Entity[MAX_ENEMIES];
 
     GLuint suitTextureID = Util::LoadTexture("suit.png");
-    
-    sampleIcons2[0] = Util::LoadTexture("tv copy.png");
-    sampleIcons2[1] = Util::LoadTexture("fireplace copy.png");
-    sampleIcons2[2] = Util::LoadTexture("tree copy.png");
-    sampleIcons2[3] = Util::LoadTexture("frog copy.png");
-    sampleIcons2[4] = Util::LoadTexture("door copy.png");
-    sampleIcons2[5] = Util::LoadTexture("microwave copy.png");
-    sampleIcons2[6] = Util::LoadTexture("balloon copy.png");
-    sampleIcons2[7] = Util::LoadTexture("piano copy.png");
-    sampleIcons2[8] = Util::LoadTexture("guitar copy.png");
-    sampleIcons2[9] = Util::LoadTexture("drums copy.png");
-
-  
-    sampleSounds_Level2[0] = Mix_LoadWAV("4.wav");
-    sampleSounds_Level2[1] = Mix_LoadWAV("5.wav");
-    sampleSounds_Level2[2] = Mix_LoadWAV("6.wav");
-    sampleSounds_Level2[3] = Mix_LoadWAV("7.wav");
 
 
     for (int i = 0; i < MAX_ENEMIES; ++i) {
@@ -194,12 +177,7 @@ void Level2::Initialize(int numLives) {
             if (sample.textureID == 0) cout << "sample texture missing!" << endl;
             int x = i % LEVEL2_WIDTH;
             int y = i / LEVEL2_WIDTH;
-            if (level2_sampleData[i] == 1)
-                sample.sampleType = tv1;
-            else if (level2_sampleData[i] == 2)
-                sample.sampleType = fireplace2;
-            else if (level2_sampleData[i] == 3)
-                sample.sampleType = tree3;
+            sample.sampleType = static_cast<SampleType>(level2_sampleData[i]);
             float xPos = x * 1.0f;
             float yPos = -y * 1.0f;
             sample.position = glm::vec3(xPos, yPos, 0);
@@ -217,15 +195,27 @@ void Level2::Update(float deltaTime) {
     state.player->Update(deltaTime, state.player, state.enemies, MAX_ENEMIES, state.map);
     for (int i = 0; i < MAX_ENEMIES; ++i) {
         state.enemies[i].Update(deltaTime, state.player, state.enemies, MAX_ENEMIES, state.map);
-        // Attack logic: if player is attacking and within range, "kill" enemy
         if (state.enemies[i].isActive &&
             (state.player->animIndices == state.player->animAttackRight ||
              state.player->animIndices == state.player->animAttackLeft)) {
             float dist = glm::distance(state.player->position, state.enemies[i].position);
-            if (dist < 0.5f) { // Attack range threshold
-                state.enemies[i].isActive = false; // Enemy dies
+            if (dist < 0.5f) {
+                state.enemies[i].isActive = false;
             }
         }
+    }
+
+    
+    static bool attackSoundPlayed = false;
+    if (!attackSoundPlayed &&
+        (state.player->animIndices == state.player->animAttackRight ||
+         state.player->animIndices == state.player->animAttackLeft)) {
+        if (attackSound) Mix_PlayChannel(-1, attackSound, 0);
+        attackSoundPlayed = true;
+    }
+    if (state.player->animIndices != state.player->animAttackRight &&
+        state.player->animIndices != state.player->animAttackLeft) {
+        attackSoundPlayed = false;
     }
 
     
@@ -245,17 +235,27 @@ void Level2::Update(float deltaTime) {
             if (dist < 1.0f && useCounter >= 3) {
                 sample.isCollected = true;
                 state.samples.push_back(sample);
+
                 
-                if (sample.sampleType == frog4)
-                    Mix_PlayChannel(-1, sampleSounds_Level2[0], 0);
-                else if (sample.sampleType == door5)
-                    Mix_PlayChannel(-1, sampleSounds_Level2[1], 0);
-                else if (sample.sampleType == microwave6)
-                    Mix_PlayChannel(-1, sampleSounds_Level2[2], 0);
-                else if (sample.sampleType == baloon7)
-                    Mix_PlayChannel(-1, sampleSounds_Level2[3], 0);
-                useCounter = 0;
-                // Optional: Add sound or visual feedback here
+                Entity iconEntity;
+                iconEntity.entityType = UI_ICON;
+                iconEntity.textureID = sampleIcons[static_cast<int>(sample.sampleType)];
+                if (iconEntity.textureID == 0) {
+                    std::cout << "texture is 0 for sampleType = " << std::endl;
+                }
+//                cout << "texgutre id" <<iconEntity.textureID  << endl;
+                iconEntity.width = 0.6f;
+                iconEntity.height = 0.6f;
+                iconEntity.isActive = true;
+                iconEntity.position = glm::vec3(-4.5f + (state.uiIcons.size() * 0.8f), 3.3f, 0);
+                
+                state.uiIcons.push_back(iconEntity);
+
+                if (sample.sampleType >= tv1 && sample.sampleType <= drums10) {
+                    int soundIndex = static_cast<int>(sample.sampleType);
+                    Mix_PlayChannel(-1, sampleSounds[soundIndex], 0);
+                }
+            
             }
         }
     }
@@ -265,8 +265,7 @@ void Level2::Update(float deltaTime) {
 
         if (state.player->numLives > 0) {
             
-            
-            state.player->position = glm::vec3(10, -10, 0);
+            state.player->position = glm::vec3(10, -11, 0);
             state.player->movement = glm::vec3(0);
             state.player->velocity = glm::vec3(0);
             state.player->isActive = true;
@@ -329,32 +328,29 @@ void Level2::Render(ShaderProgram *program) {
     }
     
     
-    glUseProgram(program->programID);
+    program->SetProjectionMatrix(glm::ortho(-5.0f, 5.0f, -3.75f, 3.75f, -1.0f, 1.0f));
+    program->SetViewMatrix(glm::mat4(1.0f));
     program->SetModelMatrix(glm::mat4(1.0f));
-
-    for (int i = 0; i < state.samples.size(); ++i) {
-        int sampleIndex = i+3; // enum to index
-        GLuint icon = sampleIcons2[sampleIndex];
-
+    
+    
+//    for (int i = 0; i < state.uiIcons.size(); ++i) {
+    int i = 0;
+    for (Entity& icon : state.uiIcons){
         
-        if (icon == 0) {
-            std::cout << "Missing or unloaded icon for sample " << i << " (type: " << sampleIndex << ")" << std::endl;
-            continue;
-        }
 
-        float x = -4.5f + (i * 0.8f);
+        float x = -4.5f + i * 0.8f;
+        i++;
         float y = 3.3f;
-
         float width = 0.6f;
         float height = 0.6f;
 
         float vertices[] = {
-            x - width/2, y - height/2,
-            x + width/2, y - height/2,
-            x + width/2, y + height/2,
-            x - width/2, y - height/2,
-            x + width/2, y + height/2,
-            x - width/2, y + height/2
+            x - width / 2, y - height / 2,
+            x + width / 2, y - height / 2,
+            x + width / 2, y + height / 2,
+            x - width / 2, y - height / 2,
+            x + width / 2, y + height / 2,
+            x - width / 2, y + height / 2
         };
 
         float texCoords[] = {
@@ -366,7 +362,7 @@ void Level2::Render(ShaderProgram *program) {
             0.0f, 0.0f
         };
 
-        glBindTexture(GL_TEXTURE_2D, icon);
+        glBindTexture(GL_TEXTURE_2D, icon.textureID);
         glVertexAttribPointer(program->positionAttribute, 2, GL_FLOAT, false, 0, vertices);
         glEnableVertexAttribArray(program->positionAttribute);
         glVertexAttribPointer(program->texCoordAttribute, 2, GL_FLOAT, false, 0, texCoords);

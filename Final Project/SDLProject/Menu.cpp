@@ -31,8 +31,7 @@ void Menu::Initialize(int numLives) {
 }
 void Menu::Update(float deltaTime) {
     if (deltaTime == -1) {
-        state.nextScene = 1/
-        ;
+        state.nextScene = 1;
     }
 }
 void Menu::Render(ShaderProgram *program) {
