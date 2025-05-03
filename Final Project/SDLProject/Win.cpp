@@ -42,6 +42,7 @@ void Win::Update(float deltaTime) {
         std::vector<Mix_Chunk*> chunks;
         std::cout << "Number of collected samples: " << state.samples.size() << std::endl;
         for (const Entity& sample : state.samples) {
+//        for (int index = 0; index < 10 ; ++index){
             int index = static_cast<int>(sample.sampleType);
             std::cout << index << std::endl;
             int fileNumber = 0;
